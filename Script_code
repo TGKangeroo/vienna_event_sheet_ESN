@@ -360,7 +360,7 @@ function makeTriggers(){
   
   
   
-  var enddate =  Utilities.formatDate(optionSheet.getRange('B30').getValue(), "Europe/Vienna", "dd-yyyy-MM");
+  var enddate =  Utilities.formatDate(new Date(optionSheet.getRange('B30').getValue()), "Europe/Vienna", "dd-yyyy-MM");
   var today =  Utilities.formatDate(new Date(), "Europe/Vienna", "dd-yyyy-MM");
   
   if(today !=enddate && today <enddate){
@@ -1460,7 +1460,7 @@ function turotial_devider(){
 function checkEndDate(){
   var enddate =optionSheet.getRange('B30').getValue(); 
   if(enddate !=null){
-    enddate =  Utilities.formatDate(enddate, "Europe/Vienna", "dd-yyyy-MM");
+    enddate =  Utilities.formatDate(new Date(enddate), "Europe/Vienna", "dd-yyyy-MM");
     var today =  Utilities.formatDate(new Date(), "Europe/Vienna", "dd-yyyy-MM");
     
     if(today ==enddate || today >enddate){
