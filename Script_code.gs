@@ -1090,18 +1090,17 @@ function makeCashDetails(){
 
 function replaceTerms(message,i){
 
-
   var columnrange =registerSheet.getRange(1, 1, 1, script_form_fields_amount + 7);
   var columnvalues = columnrange.getValues();
+
   while ( message.indexOf("[event_meetingpoint]")>-1 ||message.indexOf("[event_end_date]")>-1  || message.indexOf("[event_start_date]")>-1  ||message.indexOf("[event_title]")>-1 ||message.indexOf("[event_max_participants]")>-1   ){
 
-
     message = message.replace('[event_meetingpoint]', event_meetingpoint);
-    message = message.replace('[event_start_date]', event_start_date);
-    message = message.replace('[event_end_date]', event_end_date);
+    message = message.replace('[event_start_date]', Utilities.formatDate(new Date(event_start_date), "Europe/Vienna", "dd/MM/YYYY"));
+    message = message.replace('[event_end_date]', Utilities.formatDate(new Date(event_end_date), "Europe/Vienna", "dd/MM/YYYY"));
 
-    message = message.replace('[event_start_time]', Utilities.formatDate(new Date(event_start_time), "Europe/Vienna", "dd-yyyy-MM"));
-    message = message.replace('[event_end_time]', Utilities.formatDate(new Date(event_end_time), "Europe/Vienna", "dd-yyyy-MM"));
+    message = message.replace('[event_start_time]', event_start_time);
+    message = message.replace('[event_end_time]', event_end_time);
     message = message.replace('[event_title]', event_title);
     message = message.replace('[event_max_participants]', event_max_participants);
 
