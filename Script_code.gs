@@ -893,7 +893,7 @@ function sendGmailConfirmTemplate(recipient, subject,i, options) {
       var template = drafts[y];
     }
   }
-  if (!found) throw new Error( "TEMPLATE not found in drafts folder" );
+  if (!found) throw new Error( "TEMPLATE not found in drafts folder:"+script_confirm_mail_name);
 
   // Generate htmlBody from template, with provided text body
   var imgUpdates = updateInlineImages(template);
@@ -971,7 +971,7 @@ function sendGmailRegisterTemplate(recipient, subject,i, options) {
       var template = drafts[y];
     }
   }
-  if (!found) throw new Error( "TEMPLATE not found in drafts folder" );
+  if (!found) throw new Error( "TEMPLATE not found in drafts folder:" + draftsubject);
 
   // Generate htmlBody from template, with provided text body
   var imgUpdates = updateInlineImages(template);
