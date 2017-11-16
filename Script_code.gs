@@ -1614,10 +1614,6 @@ function removeFromPrintList(row){
 
 
     var row2= data[rowIndex];
-    optionSheet.getRange('B70').setValue(row[0]);
-    optionSheet.getRange('B71').setValue(row[1]);
-    optionSheet.getRange('B72').setValue(row2[0]);
-    optionSheet.getRange('B73').setValue(row2[1]);
     if (row[1] == row2[0] && row[2] == row2[1]) {
       // Found our match
 
