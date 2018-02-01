@@ -296,6 +296,9 @@ function makeForm(){
       if(row[1] == "text"){
         makeTextItem(form,row[0],row[4],required);
       }
+      if(row[1] == "email"){
+        makeEmailItem(form,row[0],row[4],required,item);
+      }
       if(row[1] == "dropdown"){
         makeDropdownItem(form,row[0],row[4],row[2].split(','),required);
       }
@@ -383,14 +386,21 @@ function removeTriggers(){
     ScriptApp.deleteTrigger(allTriggers[i]);
   }
 }
+function makeEmailItem(form,title,Description,required,item){
+  item = makeTextItem(form,title,Description,required,item);
+  var emailValidation = FormApp.createTextValidation()
+    .requireTextIsEmail()
+    .build();
+  item.setValidation(emailValidation)
+}
 function makeTextItem(form,title,Description,required,item){
   if(item == null){
-    var item = form.addTextItem();
+    item = form.addTextItem();
     item.setRequired(required);
   }
   item.setTitle(title)
   .setHelpText(Description);
-
+  return item;
 }
 
 function makeDropdownItem(form,title,Description,choices,required,item){
@@ -1106,7 +1116,7 @@ function replaceTerms(message,i){
 
     message = message.replace('[paypal_link]',makePayPalLink( getByName("First name",i-1), getByName("Surname",i-1),i));
     message = message.replace('[bank_transfer]',makeBankTransferDetails());
-   message = message.replace('[price]',calculatePrice(i));
+    message = message.replace('[price]',calculatePrice(i));
   }
 
   for(var j = 0; j <columnvalues[0].length; j++){
@@ -1172,7 +1182,7 @@ function tutorial_form_questions(){
     optionSheet.getRange('J5').setValue("Surname");
     optionSheet.getRange('J6').setValue("Email");
     optionSheet.getRange('K4').setValue("text");
-    optionSheet.getRange('K5').setValue("text");
+    optionSheet.getRange('K5').setValue("email");
     optionSheet.getRange('K6').setValue("text");
     optionSheet.getRange('M4').setValue("TRUE");
     optionSheet.getRange('M5').setValue("TRUE");
@@ -1210,7 +1220,7 @@ function tutorial_form_questions(){
         optionSheet.getRange(script_form_fields_amount +4 ,12).setValue(answer9);
 
       }
-      if(answer8 !="text" && answer8 !="radiobutton" && answer8!="date" && answer8 !="checkbox" && answer8 != "dropdown" && answer8 !="time" && answer8 != "datetime" && answer8 != "duration"){
+      if(answer8 !="text" && answer8 !="radiobutton" && answer8!="date" && answer8 !="checkbox" && answer8 != "dropdown" && answer8 !="time" && answer8 != "datetime" && answer8 != "duration" && answer8 != "email"){
 
         answer8 = "text";
       }
@@ -1660,8 +1670,10 @@ function editFormItem() {
     if(row[1] == "text"){
       makeTextItem(form,row[0],row[4],required,item);
     }
+    if(row[1] == "email"){
+      makeEmailItem(form,row[0],row[4],required,item);
+    }
     if(row[1] == "dropdown"){
-
       makeDropdownItem(form,row[0],row[4],row[2].split(','),required,item);
     }
     if(row[1] == "checkbox"){
