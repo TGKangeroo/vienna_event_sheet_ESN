@@ -1615,20 +1615,18 @@ function refreshPrintList(){
 
 
 }
-function removeFromPrintList(row){
+function removeFromPrintList(rowId){
+  var firstName = getByName("First name",rowId-1);
+  var lastName = getByName("Surname", rowId -1);
 
   var destData = printSheet.getRange(1, 1, printSheet.getLastRow(),5);
   var data = destData.getValues();
 
   // Find coordinates of the row where value of cell A40 matches a cell in A:A in second spreadsheet
   for (var rowIndex=0; rowIndex < event_max_participants+5; rowIndex++) {
-
-
     var row2= data[rowIndex];
-    if (row[1] == row2[0] && row[2] == row2[1]) {
+    if (firstName == row2[0] && lastName == row2[1]) {
       // Found our match
-
-
       printSheet.deleteRow(rowIndex +1);
       break; // Done, exit loop
     }
