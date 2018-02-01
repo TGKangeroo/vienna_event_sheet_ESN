@@ -1106,6 +1106,7 @@ function replaceTerms(message,i){
 
     message = message.replace('[paypal_link]',makePayPalLink( getByName("First name",i-1), getByName("Surname",i-1),i));
     message = message.replace('[bank_transfer]',makeBankTransferDetails());
+   message = message.replace('[price]',calculatePrice(i));
   }
 
   for(var j = 0; j <columnvalues[0].length; j++){
