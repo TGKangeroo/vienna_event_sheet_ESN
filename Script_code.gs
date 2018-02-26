@@ -297,7 +297,7 @@ function makeForm(){
         makeTextItem(form,row[0],row[4],required);
       }
       if(row[1] == "email"){
-        makeEmailItem(form,row[0],row[4],required,item);
+        makeEmailItem(form,row[0],row[4],required);
       }
       if(row[1] == "dropdown"){
         makeDropdownItem(form,row[0],row[4],row[2].split(','),required);
@@ -1116,6 +1116,7 @@ function replaceTerms(message,i){
 
     message = message.replace('[paypal_link]',makePayPalLink( getByName("First name",i-1), getByName("Surname",i-1),i));
     message = message.replace('[bank_transfer]',makeBankTransferDetails());
+    message = message.replace('[finance_bank_description]',finance_bank_description);
     message = message.replace('[price]',calculatePrice(i));
   }
 
