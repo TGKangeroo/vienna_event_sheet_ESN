@@ -1103,7 +1103,13 @@ function replaceTerms(message,i){
   var columnrange =registerSheet.getRange(1, 1, 1, script_form_fields_amount + 7);
   var columnvalues = columnrange.getValues();
 
-  while ( message.indexOf("[event_meetingpoint]")>-1 ||message.indexOf("[event_end_date]")>-1  || message.indexOf("[event_start_date]")>-1  ||message.indexOf("[event_title]")>-1 ||message.indexOf("[event_max_participants]")>-1   ){
+  while ( message.indexOf("[event_meetingpoint]")>-1 ||
+    message.indexOf("[event_end_date]")>-1  || 
+    message.indexOf("[event_start_date]")>-1  ||
+    message.indexOf("[event_title]")>-1 ||
+    message.indexOf("[finance_bank_description]")>-1 ||
+    message.indexOf("[price]")>-1 ||
+    message.indexOf("[event_max_participants]")>-1   ){
 
     message = message.replace('[event_meetingpoint]', event_meetingpoint);
     message = message.replace('[event_start_date]', Utilities.formatDate(new Date(event_start_date), "Europe/Vienna", "dd/MM/YYYY"));
