@@ -78,7 +78,7 @@ var EXTRA_MAIL = "extra sent";
 var tutorial = optionSheet.getRange('B44').getValue();
 
 //dsvgo
-var dsvgo_link="";
+var dsgvo_link="";
 
 function getAllPrices(){
   
@@ -324,8 +324,8 @@ function makeForm(){
       
     }
 	  
-    //add dsvgo confirmation as last question
-    //dsvgo(form);
+    //add dsgvo confirmation as last question
+    //dsgvo(form);
     form.setDestination(FormApp.DestinationType.SPREADSHEET,ss.getId());
     makeTriggers();
     
@@ -1729,9 +1729,9 @@ function checkArrayQuestion(array,question){
   return result;
   
 }
-//adds a dsvgo required radiobutton to the selected form.
-function dsvgo(form){
-var choices="I hereby agree that my data will be processed by ESN Vienna and its members in accordance with <a href='" +  dsvgo_link + "'>the data protection rules of ESN Austria</a>";
+//adds a dsgvo required radiobutton to the selected form.
+function dsgvo(form){
+var choices="I hereby agree that my data will be processed by ESN Vienna and its members in accordance with <a href='" +  dsgvo_link + "'>the data protection rules of ESN Austria</a>";
  
 makeRadioButtonItem(form,"","",choices.split(','),true )
 
