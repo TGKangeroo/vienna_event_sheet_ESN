@@ -1197,7 +1197,7 @@ SpreadsheetApp.setActiveRange(range);
     optionSheet.getRange('J6').setValue("Email");
     optionSheet.getRange('K4').setValue("text");
     optionSheet.getRange('K5').setValue("text");
-    optionSheet.getRange('K6').setValue("email"); // fix github
+    optionSheet.getRange('K6').setValue("email"); 
     optionSheet.getRange('M4').setValue("TRUE");
     optionSheet.getRange('M5').setValue("TRUE");
     optionSheet.getRange('M6').setValue("TRUE");
