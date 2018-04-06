@@ -328,7 +328,14 @@ function makeForm(){
     }
     form.setDestination(FormApp.DestinationType.SPREADSHEET,ss.getId());
     makeTriggers();
-    //sharingIsCaring(Form);
+    
+    //Sheet and form sharing permissions 
+    var thisSheet = DriveApp.getFileById(ss.getId());
+	thisSheet.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT)
+    
+    var thisForm = DriveApp.getFileById(form.getId());
+	thisForm.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT)
+    
     optionSheet.getRange('B15').setValue(""); 
     optionSheet.getRange("B34").setValue(form.getPublishedUrl());
     optionSheet.getRange("B35").setValue(form.getEditUrl());
@@ -577,26 +584,6 @@ function makeDurationItem(form,title,Description,required,item){
 
 }
 
-
-
-//share sheet with others
-function sharingIsCaring(){
-
-  var lastRow = formoptionsheet.getLastRow();
-  var dataRange = formoptionsheet.getRange(2,10,lastRow); // let it read more columns than are being used, it might mess up otherwise
-
-  var betterDatarange = formoptionsheet.getRange(3,10,dataRange.getLastRow());
-
-  // Fetch values for each row in the Range.
-  var data = betterDatarange.getValues();
-
-  for (var i = 0; i < data.length; ++i) {
-    if(data[i] !=""){
-      ss.addEditor(data[i]);
-      form.addEditor(data[i]);
-    }
-  }
-}
 
 function getColumnId(colName ) {
 
