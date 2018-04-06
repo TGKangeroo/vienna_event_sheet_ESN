@@ -296,6 +296,9 @@ function makeForm(){
       if(row[1] == "text"){
         makeTextItem(form,row[0],row[4],required);
       }
+      if(row[1] == "email"){
+        makeEmailItem(form,row[0],row[4],required);
+      }
       if(row[1] == "dropdown"){
         makeDropdownItem(form,row[0],row[4],row[2].split(','),required);
       }
@@ -383,14 +386,21 @@ function removeTriggers(){
     ScriptApp.deleteTrigger(allTriggers[i]);
   }
 }
+function makeEmailItem(form,title,Description,required,item){
+  item = makeTextItem(form,title,Description,required,item);
+  var emailValidation = FormApp.createTextValidation()
+    .requireTextIsEmail()
+    .build();
+  item.setValidation(emailValidation)
+}
 function makeTextItem(form,title,Description,required,item){
   if(item == null){
-    var item = form.addTextItem();
+    item = form.addTextItem();
     item.setRequired(required);
   }
   item.setTitle(title)
   .setHelpText(Description);
-
+  return item;
 }
 
 function makeDropdownItem(form,title,Description,choices,required,item){
@@ -893,7 +903,7 @@ function sendGmailConfirmTemplate(recipient, subject,i, options) {
       var template = drafts[y];
     }
   }
-  if (!found) throw new Error( "TEMPLATE not found in drafts folder" );
+  if (!found) throw new Error( "TEMPLATE not found in drafts folder:"+script_confirm_mail_name);
 
   // Generate htmlBody from template, with provided text body
   var imgUpdates = updateInlineImages(template);
@@ -971,7 +981,7 @@ function sendGmailRegisterTemplate(recipient, subject,i, options) {
       var template = drafts[y];
     }
   }
-  if (!found) throw new Error( "TEMPLATE not found in drafts folder" );
+  if (!found) throw new Error( "TEMPLATE not found in drafts folder:" + draftsubject);
 
   // Generate htmlBody from template, with provided text body
   var imgUpdates = updateInlineImages(template);
@@ -1093,7 +1103,13 @@ function replaceTerms(message,i){
   var columnrange =registerSheet.getRange(1, 1, 1, script_form_fields_amount + 7);
   var columnvalues = columnrange.getValues();
 
-  while ( message.indexOf("[event_meetingpoint]")>-1 ||message.indexOf("[event_end_date]")>-1  || message.indexOf("[event_start_date]")>-1  ||message.indexOf("[event_title]")>-1 ||message.indexOf("[event_max_participants]")>-1   ){
+  while ( message.indexOf("[event_meetingpoint]")>-1 ||
+    message.indexOf("[event_end_date]")>-1  || 
+    message.indexOf("[event_start_date]")>-1  ||
+    message.indexOf("[event_title]")>-1 ||
+    message.indexOf("[finance_bank_description]")>-1 ||
+    message.indexOf("[price]")>-1 ||
+    message.indexOf("[event_max_participants]")>-1   ){
 
     message = message.replace('[event_meetingpoint]', event_meetingpoint);
     message = message.replace('[event_start_date]', Utilities.formatDate(new Date(event_start_date), "Europe/Vienna", "dd/MM/YYYY"));
@@ -1106,7 +1122,8 @@ function replaceTerms(message,i){
 
     message = message.replace('[paypal_link]',makePayPalLink( getByName("First name",i-1), getByName("Surname",i-1),i));
     message = message.replace('[bank_transfer]',makeBankTransferDetails());
-   message = message.replace('[price]',calculatePrice(i));
+    message = message.replace('[finance_bank_description]',finance_bank_description);
+    message = message.replace('[price]',calculatePrice(i));
   }
 
   for(var j = 0; j <columnvalues[0].length; j++){
@@ -1172,7 +1189,7 @@ function tutorial_form_questions(){
     optionSheet.getRange('J5').setValue("Surname");
     optionSheet.getRange('J6').setValue("Email");
     optionSheet.getRange('K4').setValue("text");
-    optionSheet.getRange('K5').setValue("text");
+    optionSheet.getRange('K5').setValue("email");
     optionSheet.getRange('K6').setValue("text");
     optionSheet.getRange('M4').setValue("TRUE");
     optionSheet.getRange('M5').setValue("TRUE");
@@ -1210,7 +1227,7 @@ function tutorial_form_questions(){
         optionSheet.getRange(script_form_fields_amount +4 ,12).setValue(answer9);
 
       }
-      if(answer8 !="text" && answer8 !="radiobutton" && answer8!="date" && answer8 !="checkbox" && answer8 != "dropdown" && answer8 !="time" && answer8 != "datetime" && answer8 != "duration"){
+      if(answer8 !="text" && answer8 !="radiobutton" && answer8!="date" && answer8 !="checkbox" && answer8 != "dropdown" && answer8 !="time" && answer8 != "datetime" && answer8 != "duration" && answer8 != "email"){
 
         answer8 = "text";
       }
@@ -1605,24 +1622,18 @@ function refreshPrintList(){
 
 
 }
-function removeFromPrintList(row){
+function removeFromPrintList(rowId){
+  var firstName = getByName("First name",rowId-1);
+  var lastName = getByName("Surname", rowId -1);
 
   var destData = printSheet.getRange(1, 1, printSheet.getLastRow(),5);
   var data = destData.getValues();
 
   // Find coordinates of the row where value of cell A40 matches a cell in A:A in second spreadsheet
   for (var rowIndex=0; rowIndex < event_max_participants+5; rowIndex++) {
-
-
     var row2= data[rowIndex];
-    optionSheet.getRange('B70').setValue(row[0]);
-    optionSheet.getRange('B71').setValue(row[1]);
-    optionSheet.getRange('B72').setValue(row2[0]);
-    optionSheet.getRange('B73').setValue(row2[1]);
-    if (row[1] == row2[0] && row[2] == row2[1]) {
+    if (firstName == row2[0] && lastName == row2[1]) {
       // Found our match
-
-
       printSheet.deleteRow(rowIndex +1);
       break; // Done, exit loop
     }
@@ -1664,8 +1675,10 @@ function editFormItem() {
     if(row[1] == "text"){
       makeTextItem(form,row[0],row[4],required,item);
     }
+    if(row[1] == "email"){
+      makeEmailItem(form,row[0],row[4],required,item);
+    }
     if(row[1] == "dropdown"){
-
       makeDropdownItem(form,row[0],row[4],row[2].split(','),required,item);
     }
     if(row[1] == "checkbox"){
