@@ -1586,7 +1586,7 @@ function refreshPrintList(){
 
     if(getByName("Paid",i+1)=="yes"){
 
-      printSheet.appendRow([getByName("First name",i+1), getByName("Surname", i +1), getByName("ESNSection",i+1)]);
+       printSheet.appendRow([row[0], row[1], getByName("ESNSection",i+1)]);
 
     }
 
