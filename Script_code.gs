@@ -1731,8 +1731,10 @@ function checkArrayQuestion(array,question){
 }
 //adds a dsgvo required radiobutton to the selected form.
 function dsgvo(form){
-var choices="I hereby agree that my data will be processed by ESN Vienna and its members in accordance with <a href='" +  dsgvo_link + "'>the data protection rules of ESN Austria</a>";
- 
-makeRadioButtonItem(form,"","",choices.split(','),true )
+
+  var dsgvo_choices="I hereby agree that my data will be processed by ESN Vienna and its members during the process of this event";
+//var choices="I hereby agree that my data will be processed by ESN Vienna and its members in accordance with <a href='" +  dsgvo_link + "'>the data protection rules of ESN Austria</a>";
+ var dsgvo_description="We will use this data only for this event and will only pass the data in context of this event if it's absolutly necessary (e.g. to a Hostel). The data will not be used or passed to a third party outside of the context of this event.";
+makeRadioButtonItem(form,"",dsgvo_description,dsgvo_choices.split(','),true )
 
 }
