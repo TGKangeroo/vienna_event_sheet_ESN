@@ -1740,5 +1740,6 @@ script_form_fields_amount = optionSheet.getRange('B29').getValue();
       optionSheet.getRange( script_form_fields_amount+4,10).setValue("Data processing");
       optionSheet.getRange(script_form_fields_amount+4,11).setValue('radiobutton');
       optionSheet.getRange(script_form_fields_amount+4,13).setValue('TRUE');
-      optionSheet.getRange(script_form_fields_amount+4,12).setValue('yes');
+      optionSheet.getRange(script_form_fields_amount+4,12).setValue(dsgvo_choices);
+      optionSheet.getRange(script_form_fields_amount+4,14).setValue(dsgvo_description);
 }
