@@ -407,7 +407,6 @@ function makeTextItem(form,title,Description,required,item){
   }
   item.setTitle(title)
   .setHelpText(Description);
-  return item;
 }
 
 function makeDropdownItem(form,title,Description,choices,required,item){
