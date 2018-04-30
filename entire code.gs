@@ -656,6 +656,7 @@ function calculatePrice(row){
   var pay = 0;
   for (var i =0;i < prices.length;i++){
 
+  if(!(isNaN(prices[i][1] ))){
 
     if(prices[i][3] == "Base Price"){
       pay = pay + prices[i][1];
@@ -666,8 +667,10 @@ function calculatePrice(row){
       }
     }
 
+}
 
   }
+
 
 
   return pay;
