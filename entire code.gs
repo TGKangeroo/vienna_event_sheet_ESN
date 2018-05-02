@@ -343,7 +343,7 @@ function makeForm(){
     }
 	  
     //add dsgvo confirmation as last question
-    //dsgvo(form);
+    dsgvo(form);
     form.setDestination(FormApp.DestinationType.SPREADSHEET,ss.getId());
     makeTriggers();
     
