@@ -1,0 +1,308 @@
+//variables for sheet declaration --------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+var optionSheet = ss.getSheetByName("Options");
+
+var printSheet=ss.getSheetByName("Print list");
+var financeSheet = ss.getSheetByName("Finances");
+var budgetSheet = ss.getSheetByName("Budget");
+
+
+
+var registerSheet = ss.getSheets()[0];
+
+
+
+//variables for event information (Blue block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
+var event_title = optionSheet.getRange('B3').getValue();
+var event_description = optionSheet.getRange('B4').getValue();
+var event_start_date = optionSheet.getRange('B5').getValue();
+var event_start_time = optionSheet.getRange('B6').getValue();
+var event_end_date = optionSheet.getRange('B7').getValue();
+var event_end_time = optionSheet.getRange('B8').getValue();
+var event_meetingpoint = optionSheet.getRange('B9').getValue();
+var event_max_participants = optionSheet.getRange('B10').getValue();
+var event_isPaid = optionSheet.getRange('B11').getValue();
+
+//variables for script functions (red block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
+var script_auto_confirm_mails = optionSheet.getRange('B19').getValue();
+var script_confirm_mail_name = optionSheet.getRange('B20').getValue();
+var script_auto_registration_mails = optionSheet.getRange('B21').getValue();
+var script_registration_mail_name = optionSheet.getRange('B22').getValue();
+var script_register_on_pay = optionSheet.getRange('B23').getValue();
+var script_extra_mail_name = optionSheet.getRange('B24').getValue();
+var script_extra_mail_on_pay = optionSheet.getRange('B25').getValue();
+var script_sticky_names = optionSheet.getRange('B26').getValue();
+var script_close_form_max_part = optionSheet.getRange('B27').getValue();
+var script_color_on_paid = optionSheet.getRange('B28').getValue();
+var script_form_fields_amount = optionSheet.getRange('B29').getValue();
+var script_registration_close_date = optionSheet.getRange('B30').getValue();
+var script_paid_row_added = optionSheet.getRange('B15').getValue();
+var script_form_made = optionSheet.getRange('B16').getValue(); 
+//variables for the event price (yellow block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
+var amount_total_part = optionSheet.getRange('F17').getValue();
+var price_total_money = optionSheet.getRange('F18').getValue();
+var price_total_amount_prices = optionSheet.getRange('F19').getValue();
+var prices = getAllPrices();
+
+
+//returns array of all prices written in the yellow optionsheet block --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function getAllPrices(){
+  
+  var dataRange = optionSheet.getRange(3,4,13,5);
+  
+  var data = dataRange.getValues();
+  
+  return data;
+  
+}
+
+//returns array of all questions written in the pink optionsheet block --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function getAllQuestions(){
+  var dataRange = optionSheet.getRange(4,10,32,5);
+  
+  var data = dataRange.getValues();
+  
+  return data;
+  
+  
+}
+
+//adds the price a participant has to pay to the registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function totalPriceToBePaid(row){
+  
+  
+var price=calculatePrice(row)
+registerSheet.getRange(row+1,script_form_fields_amount + 4).setValue(price);
+}
+
+
+
+//Add last edited and paid columns to registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function makePayAndEditedRow(){
+  var firstcell = registerSheet.getRange(1,script_form_fields_amount +2);
+  
+  firstcell.setValue('Paid');
+  
+  var secondcell = registerSheet.getRange(1,script_form_fields_amount +3);
+  secondcell.setValue('last Edited');
+  
+  var thirdcell = registerSheet.getRange(1,script_form_fields_amount +3);
+  secondcell.setValue('to be paid');
+  
+  optionSheet.getRange('B15').setValue("yes");
+  
+}
+
+
+
+
+//retrieves the number of a column based on the column name --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function getColumnId(colName ) {
+
+  var data = registerSheet.getDataRange().getValues();
+  var col = data[0].indexOf(colName);
+  if (col != -1) {
+    return col +1;
+  }else{
+    return -1;
+  }
+}
+
+//searches a registration value based on column name and row --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function getByName(colName, row ) {
+
+  var data = registerSheet.getDataRange().getValues();
+  var col = data[0].indexOf(colName);
+  if (col != -1) {
+    if(data[row]!=null){
+      if(data[row][col] != null ){
+        return data[row][col];
+      }else{
+        return "";
+      }
+    }}
+}
+
+//updates the amount field 29B --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function updatePrices(){
+
+  var prices = getAllPrices();
+  for (var i = 0; i < prices.length;i++){
+    prices[i][2] = 0;
+  }
+
+  var dataRange = registerSheet.getRange(2, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 3); // let it read more columns than are being used, it might mess up otherwise
+  var data2 = registerSheet.getDataRange().getValues();
+  // Fetch values for each row in the Range.
+  var data = dataRange.getValues();
+  for (var i = 0; i < data.length; ++i) {
+    if (data[i][script_form_fields_amount+1] =="yes"){
+      for (var y =0;y < prices.length;y++){
+
+        var index = data2[0].indexOf(prices[y][3]);
+
+        if(data[i][index] == prices[y][4]){
+          prices[y][2] = prices[y][2] + 1;
+        }
+
+      }
+
+    }
+  }
+
+  dataRange = optionSheet.getRange(3,6,14);
+  data = dataRange.getValues();
+
+  for(i = 0 ; i <data.length;i++){
+
+    if(prices[i]!=null){
+      optionSheet.getRange(i+3,6).setValue(prices[i][2]);
+      SpreadsheetApp.flush();
+    }
+  }
+
+}
+
+
+//Calculate the price per participant --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function calculatePrice(row){
+  var prices = getAllPrices();
+  var pay = 0;
+  for (var i =0;i < prices.length;i++){
+    if(!(isNaN(prices[i][1] ))){
+
+    if(prices[i][3] == "Base Price"){
+      pay = pay + prices[i][1];
+    }else{
+
+      if(getByName(prices[i][3], row) == prices[i][4]){
+        pay = pay + prices[i][1];
+      }
+    }
+    }
+
+  }
+  
+
+  return pay;
+
+}
+
+
+//check if the registration end date equals to todays date --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function checkEndDate(){
+  var enddate =optionSheet.getRange('B30').getValue();
+  if(enddate !=null){
+    enddate =  Utilities.formatDate(new Date(enddate), "Europe/Vienna", "dd-yyyy-MM");
+    var today =  Utilities.formatDate(new Date(), "Europe/Vienna", "dd-yyyy-MM");
+
+    if(today ==enddate || today >enddate){
+
+      closeForm();
+      removeTriggers();
+      makeTriggers();
+    }
+  }
+
+
+
+}
+
+//Count the amount of paid participants --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function countParticipants(){
+  var dataRange = registerSheet.getRange(2, script_form_fields_amount+2, registerSheet.getLastRow() -1, script_form_fields_amount + 2); // let it read more columns than are being used, it might mess up otherwise
+  // Fetch values for each row in the Range.
+  var data = dataRange.getValues();
+  var counter = 0;
+  for (var i = 0; i < data.length; ++i) {
+    var row = data[i];
+
+
+
+
+    if(row[0]=="yes"){
+      counter++;
+    }
+
+    // Make sure the cell is updated right away in case the script is interrupted
+    SpreadsheetApp.flush();
+  }
+  return counter;
+}
+
+
+//Update all variables taken from the sheet and triggers --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function updateVariables(){
+  // event variables
+  event_title = optionSheet.getRange('B3').getValue();
+  event_description = optionSheet.getRange('B4').getValue();
+  event_start_date = optionSheet.getRange('B5').getValue();
+  event_start_time = optionSheet.getRange('B6').getValue();
+  event_end_date = optionSheet.getRange('B7').getValue();
+  event_end_time = optionSheet.getRange('B8').getValue();
+  event_meetingpoint = optionSheet.getRange('B9').getValue();
+  event_max_participants = optionSheet.getRange('B10').getValue();
+  event_isPaid = optionSheet.getRange('B11').getValue();
+
+  //script questions
+  script_auto_confirm_mails = optionSheet.getRange('B19').getValue();
+  script_confirm_mail_name = optionSheet.getRange('B20').getValue();
+  script_auto_registration_mails = optionSheet.getRange('B21').getValue();
+  script_registration_mail_name = optionSheet.getRange('B22').getValue();
+  script_register_on_pay = optionSheet.getRange('B23').getValue();
+  script_extra_mail_name = optionSheet.getRange('B24').getValue();
+  script_extra_mail_on_pay = optionSheet.getRange('B25').getValue();
+  script_sticky_names = optionSheet.getRange('B26').getValue();
+  script_close_form_max_part = optionSheet.getRange('B27').getValue();
+  script_color_on_paid = optionSheet.getRange('B28').getValue();
+  script_form_fields_amount = optionSheet.getRange('B29').getValue();
+  script_registration_close_date = optionSheet.getRange('B30').getValue();
+  script_paid_row_added = optionSheet.getRange('B15').getValue();
+  script_form_made = optionSheet.getRange('B16').getValue();
+  // price variables
+  amount_total_part = optionSheet.getRange('F17').getValue();
+  price_total_money = optionSheet.getRange('F18').getValue();
+  price_total_amount_prices = optionSheet.getRange('F19').getValue();
+  prices = getAllPrices();
+
+
+  // finance variables
+  //PayPal
+  finance_paypal_allowed = financeSheet.getRange('B5').getValue();
+  finance_paypal_email = financeSheet.getRange('B6').getValue();
+  finance_paypal_percentage = financeSheet.getRange('B7').getValue();
+  finance_paypal_description = financeSheet.getRange('B8').getValue();
+
+  //bank transfer
+  finance_bank_allowed = financeSheet.getRange('B12').getValue();
+  finance_bank_owner = financeSheet.getRange('B13').getValue();
+  finance_bank_name = financeSheet.getRange('B14').getValue();
+  finance_bank_IBAN = financeSheet.getRange('B15').getValue();
+  finance_bank_BIC = financeSheet.getRange('B16').getValue();
+  finance_bank_description = financeSheet.getRange('B17').getValue();
+
+  //cash
+  finance_cash_allowed = financeSheet.getRange('B21').getValue();
+  finance_cash_office = financeSheet.getRange('B22').getValue();
+  finance_cash_days = financeSheet.getRange('B22').getValue();
+  finance_cash_hours = financeSheet.getRange('B23').getValue();
+
+
+  removeTriggers();
+  makeTriggers();
+}
+
+
+
+//test function for development --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function test_Jens(){
+
+ SpreadsheetApp.setActiveSheet(optionSheet);
+ var range = optionSheet.getRange("B3:B11");
+
+range.setBackground('Red');
+  
+  
+}
