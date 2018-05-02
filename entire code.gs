@@ -778,7 +778,7 @@ function confirmationEmail(){
 
 
       var emailSent = row[script_form_fields_amount + 6];     // column where we can check if the user already got an email
-      if (emailSent != CONFIRM_MAIL && getByName("Email",i) !="" &&  getByName("Paid",i+1)=="yes") {  // Prevents sending duplicates
+      if (emailSent != CONFIRM_MAIL && getByName("Email",i) !="" &&  getByName("Paid",i)=="yes") {  // Prevents sending duplicates
         var subject = "Confirmation " + event_title;
 
 
@@ -845,7 +845,7 @@ function sendExtraEmail(){
       if(script_extra_mail_name != ""){
 
         if(script_extra_mail_on_pay == "yes" ){
-          if(getByName("Paid",i+1)=="yes"){
+          if(getByName("Paid",i)=="yes"){
 
             if(sendGmailExtraTemplate(getByName("Email",i), subject,i)){
               registerSheet.getRange(1 + i, script_form_fields_amount + 8).setValue(EXTRA_MAIL);
