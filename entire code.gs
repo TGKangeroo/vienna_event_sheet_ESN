@@ -107,7 +107,7 @@ function onEdit(e){
   var range = e.range
   var row = range.getRow(); // row used for inserting into the google sheet
   var row_script=row-1 // counting started from 1 instead of from 0 dirty fix to make it look like an array usable for every function in this sheet.
- 
+ var editedSheet = e.source.getActiveSheet();
 
   var answer = "yes";
   
@@ -240,7 +240,7 @@ function onSubmit(e){
   var range = e.range;
   var row = range.getRow(); // row used for inserting into the google sheet
   var row_script=row-1 // counting started from 1 instead of from 0 dirty fix to make it look like an array usable for every function in this sheet.
-  
+  var editedSheet = e.source.getActiveSheet();
   var cell= paidRange.getCell(row-1,2);
   var rule = SpreadsheetApp.newDataValidation().requireValueInList(['yes', 'no','cancelled','refunded'], false).build();
   cell.setDataValidation(rule);
@@ -276,6 +276,10 @@ function onSubmit(e){
     sendRegisterEmail(row_script);
   }
   
+  if(editedSheet.getName()==registerSheet.getName()){
+   totalPriceToBePaid(row);
+  }	
+	
   SpreadsheetApp.flush();
   
 }
