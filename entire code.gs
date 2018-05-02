@@ -108,12 +108,13 @@ function onEdit(e){
   var row = range.getRow(); // row used for inserting into the google sheet
   var row_script=row-1 // counting started from 1 instead of from 0 dirty fix to make it look like an array usable for every function in this sheet.
  
+
   var answer = "yes";
   
   event_max_participants = optionSheet.getRange('B10').getValue();
   var amount_total_part=0;
   //check if the changed value is on the paid row and if it's changed to yes
-  if(range.getColumn() == script_form_fields_amount + 2 && e.value =="yes"){
+  if(range.getColumn() == script_form_fields_amount + 2 && e.value =="yes" && editedSheet.getName()==registerSheet.getName()){
     optionSheet.getRange('F17').setValue(countParticipants()); 
     amount_total_part = optionSheet.getRange('F17').getValue();
     if(amount_total_part > event_max_participants){
@@ -178,9 +179,9 @@ function onEdit(e){
     
   }
   
-
-
-
+ if(editedSheet.getName()==registerSheet.getName()){
+   totalPriceToBePaid(row);
+  }
 
   updatePrices();
   
@@ -202,13 +203,13 @@ function openForm(){
   form.setAcceptingResponses(true);
 }
 
-
-
-
-
-
-
-
+//adds the price a participant has to pay to the registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function totalPriceToBePaid(row){
+  
+  
+var price=calculatePrice(row)
+registerSheet.getRange(row+1,script_form_fields_amount + 4).setValue(price);
+}
 
 //Add last edited and paid columns to registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makePayAndEditedRow(){
@@ -219,8 +220,8 @@ function makePayAndEditedRow(){
   var secondcell = registerSheet.getRange(1,script_form_fields_amount +3);
   secondcell.setValue('last Edited');
   
-
-
+  var thirdcell = registerSheet.getRange(1,script_form_fields_amount +3);
+  secondcell.setValue('to be paid');
 
   optionSheet.getRange('B15').setValue("yes");
   
@@ -684,7 +685,7 @@ function calculatePrice(row){
   var prices = getAllPrices();
   var pay = 0;
   for (var i =0;i < prices.length;i++){
-  if(!(isNaN(prices[i][1] ))){
+    if(!(isNaN(prices[i][1] ))){
 
     if(prices[i][3] == "Base Price"){
       pay = pay + prices[i][1];
@@ -694,7 +695,7 @@ function calculatePrice(row){
         pay = pay + prices[i][1];
       }
     }
-}
+    }
 
   }
 
@@ -706,11 +707,6 @@ function calculatePrice(row){
 
 //fixes any attachments or pictures in email template --------------------------------------------------------------------------------------------------------------------------------------------------------//
 /**
-* This function was adapted from YetAnotherMailMerge by Romain Vaillard.
-* Given a template email message, identify any attachments that are used
-* as inline images in the message, and move them from the attachments list
-* to the inlineImages list, updating the body of the message accordingly.
-*
 * @param   {GmailMessage} template  Message to use as template
 * @returns {Object}                 An object containing the updated
 *                                   templateBody, attachments and inlineImages.
@@ -769,7 +765,7 @@ function confirmationEmail(){
   if(script_auto_confirm_mails=="yes"){
 
     //redefine the datarange to the registerSheet values
-    var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 7); // let it read more columns than are being used, it might mess up otherwise
+    var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 8); // let it read more columns than are being used, it might mess up otherwise
     // Fetch values for each row in the Range.
     var data = dataRange.getValues();
     for (var i = 1; i < data.length; ++i) {
@@ -777,7 +773,7 @@ function confirmationEmail(){
 
 
 
-      var emailSent = row[script_form_fields_amount + 5];     // column where we can check if the user already got an email
+      var emailSent = row[script_form_fields_amount + 6];     // column where we can check if the user already got an email
       if (emailSent != CONFIRM_MAIL && getByName("Email",i) !="" &&  getByName("Paid",i+1)=="yes") {  // Prevents sending duplicates
         var subject = "Confirmation " + event_title;
 
@@ -785,7 +781,7 @@ function confirmationEmail(){
         //if the user has a whole confirm draft
         if(script_confirm_mail_name != ""){
           if( sendGmailConfirmTemplate(getByName("Email",i), subject,i))
-            registerSheet.getRange(1 + i, script_form_fields_amount + 6).setValue(CONFIRM_MAIL);
+            registerSheet.getRange(1 + i, script_form_fields_amount + 7).setValue(CONFIRM_MAIL);
         }
 
 
@@ -802,7 +798,7 @@ function registerEmail(){
 
   if(script_auto_registration_mails=="yes"){
 
-    var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 7); // let it read more columns than are being used, it might mess up otherwise
+    var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 8); // let it read more columns than are being used, it might mess up otherwise
     // Fetch values for each row in the Range.
     var data = dataRange.getValues();
     for (var i = 1; i < data.length; ++i) {
@@ -810,12 +806,12 @@ function registerEmail(){
       var  row = data[i];
 
 
-      var emailSent = row[script_form_fields_amount + 5];     // Third column
+      var emailSent = row[script_form_fields_amount + 6];     // Third column
       if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && getByName("Email",i) !="") {  // Prevents sending duplicates
         var subject = "Registration " + event_title;
         if(script_registration_mail_name != ""){
           if(sendGmailRegisterTemplate(getByName("Email",i), subject,i))
-            registerSheet.getRange(1 + i, script_form_fields_amount + 6).setValue(REGISTER_MAIL);
+            registerSheet.getRange(1 + i, script_form_fields_amount + 7).setValue(REGISTER_MAIL);
         }
 
 
@@ -831,7 +827,7 @@ function sendExtraEmail(){
 
 
 
-  var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 7); // let it read more columns than are being used, it might mess up otherwise
+  var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 8); // let it read more columns than are being used, it might mess up otherwise
   // Fetch values for each row in the Range.
   var data = dataRange.getValues();
   for (var i = 1; i < data.length; ++i) {
@@ -839,7 +835,7 @@ function sendExtraEmail(){
     row = data[i];
 
 
-    var emailSent = row[script_form_fields_amount + 6];     // Third column
+    var emailSent = row[script_form_fields_amount + 7];     // Third column
     if (emailSent != EXTRA_MAIL && getByName("Email",i) !="" ) {  // Prevents sending duplicates
       var subject =  event_title;
       if(script_extra_mail_name != ""){
@@ -848,13 +844,13 @@ function sendExtraEmail(){
           if(getByName("Paid",i+1)=="yes"){
 
             if(sendGmailExtraTemplate(getByName("Email",i), subject,i)){
-              registerSheet.getRange(1 + i, script_form_fields_amount + 7).setValue(EXTRA_MAIL);
+              registerSheet.getRange(1 + i, script_form_fields_amount + 8).setValue(EXTRA_MAIL);
 
             }
           }
         }else{
           if(sendGmailExtraTemplate(getByName("Email",i), subject,i))
-            registerSheet.getRange(1 + i, script_form_fields_amount + 7).setValue(EXTRA_MAIL);
+            registerSheet.getRange(1 + i, script_form_fields_amount + 8).setValue(EXTRA_MAIL);
         }
       }
 
@@ -871,7 +867,7 @@ function sendExtraEmail(){
 function sendconfirmationEmail(row){
 
   if(script_auto_confirm_mails=="yes"){
-    var data = registerSheet.getRange(row+1,script_form_fields_amount + 6 , 1, 1).getValues();
+    var data = registerSheet.getRange(row+1,script_form_fields_amount + 7 , 1, 1).getValues();
 
 
     var emailSent = data[0];
@@ -885,7 +881,7 @@ function sendconfirmationEmail(row){
       //if the user has a whole confirm draft
       if(script_confirm_mail_name != ""){
         if( sendGmailConfirmTemplate(getByName("Email",row), subject,row))
-          registerSheet.getRange(row +1, script_form_fields_amount + 6).setValue(CONFIRM_MAIL);
+          registerSheet.getRange(row +1, script_form_fields_amount + 7).setValue(CONFIRM_MAIL);
       }
 
 
@@ -950,7 +946,7 @@ function sendGmailConfirmTemplate(recipient, subject,i, options) {
 function sendRegisterEmail(row){
 
   if(script_auto_registration_mails=="yes"){
-    var data = registerSheet.getRange(row+1,script_form_fields_amount + 6 , 1, 1).getValues();
+    var data = registerSheet.getRange(row+1,script_form_fields_amount + 7 , 1, 1).getValues();
 
 
     var emailSent = data[0];     // column where we can check if the user already got an email
@@ -961,7 +957,7 @@ function sendRegisterEmail(row){
       //if the user has a whole confirm draft
       if(script_registration_mail_name != ""){
         if( sendGmailRegisterTemplate(getByName("Email",row), subject,row))
-          registerSheet.getRange(row+1, script_form_fields_amount + 6).setValue(REGISTER_MAIL);
+          registerSheet.getRange(row+1, script_form_fields_amount + 7).setValue(REGISTER_MAIL);
       }
 
 
@@ -1586,17 +1582,6 @@ function updateVariables(){
   makeTriggers();
 }
 
-
-
-
-
-
-
-
-
-
-
-
 //Add participant to print list --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function addToPrintList(row){
   printSheet.appendRow([getByName("First name",row), getByName("Surname", row), getByName("ESNSection",row)]);
@@ -1620,12 +1605,6 @@ function makePrintList(){
 function refreshPrintList(){
 
   printSheet.clearContents();
-
-
-
-
-
-
 
   var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount  + 6); // let it read more columns than are being used, it might mess up otherwise
   // Fetch values for each row in the Range.
