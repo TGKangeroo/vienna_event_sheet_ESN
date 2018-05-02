@@ -1,4 +1,4 @@
-//sheet variables
+//variables for sheet declaration --------------------------------------------------------------------------------------------------------------------------------------------------------//
 
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 
@@ -14,7 +14,7 @@ var registerSheet = ss.getSheets()[0];
 
 
 
-// event variables
+//variables for event information (Blue block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
 var event_title = optionSheet.getRange('B3').getValue();
 var event_description = optionSheet.getRange('B4').getValue();
 var event_start_date = optionSheet.getRange('B5').getValue();
@@ -25,7 +25,7 @@ var event_meetingpoint = optionSheet.getRange('B9').getValue();
 var event_max_participants = optionSheet.getRange('B10').getValue();
 var event_isPaid = optionSheet.getRange('B11').getValue();
 
-//script questions
+//variables for script functions (red block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
 var script_auto_confirm_mails = optionSheet.getRange('B19').getValue();
 var script_confirm_mail_name = optionSheet.getRange('B20').getValue();
 var script_auto_registration_mails = optionSheet.getRange('B21').getValue();
@@ -40,14 +40,14 @@ var script_form_fields_amount = optionSheet.getRange('B29').getValue();
 var script_registration_close_date = optionSheet.getRange('B30').getValue();
 var script_paid_row_added = optionSheet.getRange('B15').getValue();
 var script_form_made = optionSheet.getRange('B16').getValue(); 
-// price variables
+//variables for the event price (yellow block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
 var amount_total_part = optionSheet.getRange('F17').getValue();
 var price_total_money = optionSheet.getRange('F18').getValue();
 var price_total_amount_prices = optionSheet.getRange('F19').getValue();
 var prices = getAllPrices();
 
 
-// finance variables
+//Payment variables --------------------------------------------------------------------------------------------------------------------------------------------------------//
 //PayPal
 var finance_paypal_allowed = financeSheet.getRange('B5').getValue();
 var finance_paypal_email = financeSheet.getRange('B6').getValue();
@@ -69,17 +69,18 @@ var finance_cash_days = financeSheet.getRange('B22').getValue();
 var finance_cash_hours = financeSheet.getRange('B23').getValue();
 
 
-//constant variables
+//Static variables --------------------------------------------------------------------------------------------------------------------------------------------------------//
 var CONFIRM_MAIL = "confirm sent";
 var REGISTER_MAIL = "register sent";
 var EXTRA_MAIL = "extra sent";
 
-//tutorial vars
+//tutorial variables --------------------------------------------------------------------------------------------------------------------------------------------------------//
 var tutorial = optionSheet.getRange('B44').getValue();
 
-//dsvgo
+//DSGVO variables --------------------------------------------------------------------------------------------------------------------------------------------------------//
 var dsgvo_link="";
 
+//returns array of all prices written in the yellow optionsheet block --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function getAllPrices(){
   
   var dataRange = optionSheet.getRange(3,4,13,5);
@@ -90,6 +91,7 @@ function getAllPrices(){
   
 }
 
+//returns array of all questions written in the pink optionsheet block --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function getAllQuestions(){
   var dataRange = optionSheet.getRange(4,10,32,5);
   
@@ -104,11 +106,14 @@ function getAllQuestions(){
 
 
 
+//on Sheet Edit Trigger --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function onEdit(e){
   var paid = getColumnId("Paid");
   var range = e.range
   var row = range.getRow();
   
+
+
   var answer = "yes";
   
   event_max_participants = optionSheet.getRange('B10').getValue();
@@ -179,13 +184,17 @@ function onEdit(e){
     
   }
   
+
+
+
+
   updatePrices();
   
 }
 
 
 
-//close the google form
+//Stops accepting responses to the google form --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function closeForm(){
   var form = FormApp.openByUrl(optionSheet.getRange('B35').getValue());
   
@@ -194,7 +203,7 @@ function closeForm(){
   
 }
 
-//open the google form
+//Opens the google form for responses --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function openForm(){
   var form = FormApp.openByUrl(optionSheet.getRange('B35').getValue());
   
@@ -202,7 +211,15 @@ function openForm(){
 }
 
 
-//makes the paid and last edited row
+
+
+
+
+
+
+
+
+//Add last edited and paid columns to registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makePayAndEditedRow(){
   var firstcell = registerSheet.getRange(1,script_form_fields_amount +2);
   
@@ -211,11 +228,14 @@ function makePayAndEditedRow(){
   var secondcell = registerSheet.getRange(1,script_form_fields_amount +3);
   secondcell.setValue('last Edited');
   
+
+
+
   optionSheet.getRange('B15').setValue("yes");
   
 }
 
-//function activated when someone submits a form response
+//on Form Submit Trigger --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function onSubmit(e){
   
   var paidRange = registerSheet.getRange(2, script_form_fields_amount +1, registerSheet.getMaxRows(), script_form_fields_amount + 2);
@@ -227,6 +247,7 @@ function onSubmit(e){
   
   var range = e.range;
   var row = range.getRow();
+
   
   var cell= paidRange.getCell(row-1,2);
   var rule = SpreadsheetApp.newDataValidation().requireValueInList(['yes', 'no','cancelled','refunded'], false).build();
@@ -270,7 +291,7 @@ function onSubmit(e){
 
 
 
-//make the form with questions
+//Make google form ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeForm(){
   
   if(script_form_made!="yes"){
@@ -322,6 +343,10 @@ function makeForm(){
         makeDurationItem(form,row[0],row[4],required);
       }
       
+
+
+
+
     }
 	  
     //add dsgvo confirmation as last question
@@ -353,7 +378,7 @@ function makeForm(){
 }
 
 
-//make automatic triggers
+//Add Triggers --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeTriggers(){
 
 
@@ -386,13 +411,16 @@ function makeTriggers(){
 
 
 
-//remove triggers
+//Remove Triggers --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function removeTriggers(){
   var allTriggers = ScriptApp.getProjectTriggers();
   for (var i = 0; i < allTriggers.length; i++) {
     ScriptApp.deleteTrigger(allTriggers[i]);
   }
 }
+
+
+//Make form question with email input field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeEmailItem(form,title,Description,required,item){
   item = makeTextItem(form,title,Description,required,item);
   var emailValidation = FormApp.createTextValidation()
@@ -400,6 +428,8 @@ function makeEmailItem(form,title,Description,required,item){
     .build();
   item.setValidation(emailValidation)
 }
+
+//Make form question with text input field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeTextItem(form,title,Description,required,item){
   if(item == null){
     item = form.addTextItem();
@@ -409,6 +439,8 @@ function makeTextItem(form,title,Description,required,item){
   .setHelpText(Description);
 }
 
+
+//Make form question with dropdown field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeDropdownItem(form,title,Description,choices,required,item){
   var process = "update";
   if(item == null){
@@ -455,6 +487,8 @@ function makeDropdownItem(form,title,Description,choices,required,item){
 
 }
 
+
+//Make form question with checkbox field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeCheckBoxItem(form,title,Description,choices,required,item){
   process = "update";
   if(item == null){
@@ -497,6 +531,7 @@ function makeCheckBoxItem(form,title,Description,choices,required,item){
 
 }
 
+//Make form question with radio button field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeRadioButtonItem(form,title,Description,choices,required,item ){
   process="update";
   if(item == null){
@@ -535,6 +570,8 @@ function makeRadioButtonItem(form,title,Description,choices,required,item ){
   }
 }
 
+
+//Make form question with date input field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeDateItem(form,title,Description,required,item){
   if(item == null){
     var item = form.addDateItem();
@@ -545,6 +582,7 @@ function makeDateItem(form,title,Description,required,item){
 
 }
 
+//Make form question with date item input field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeDateTimeItem(form,title,Description,required,item){
 
 
@@ -559,6 +597,7 @@ function makeDateTimeItem(form,title,Description,required,item){
 
 }
 
+//Make form question with time input field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeTimeItem(form,title,Description,required,item){
 
   if(item == null){
@@ -572,6 +611,7 @@ function makeTimeItem(form,title,Description,required,item){
 
 }
 
+//Make form question with duration input field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeDurationItem(form,title,Description,required,item){
   if(item == null){
     var item = form.addDurationItem();
@@ -584,6 +624,7 @@ function makeDurationItem(form,title,Description,required,item){
 }
 
 
+//retrieves the number of a column based on the column name --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function getColumnId(colName ) {
 
   var data = registerSheet.getDataRange().getValues();
@@ -595,6 +636,7 @@ function getColumnId(colName ) {
   }
 }
 
+//searches a registration value based on column name and row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function getByName(colName, row ) {
 
   var data = registerSheet.getDataRange().getValues();
@@ -609,7 +651,7 @@ function getByName(colName, row ) {
     }}
 }
 
-//updates the Amount column in the prices block
+//updates the amount field 29B --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function updatePrices(){
 
   var prices = getAllPrices();
@@ -650,6 +692,7 @@ function updatePrices(){
 }
 
 
+//Calculate the price per participant --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function calculatePrice(row){
 
   var prices = getAllPrices();
@@ -676,6 +719,9 @@ function calculatePrice(row){
   return pay;
 
 }
+
+
+//fixes any attachments or pictures in email template --------------------------------------------------------------------------------------------------------------------------------------------------------//
 /**
 * This function was adapted from YetAnotherMailMerge by Romain Vaillard.
 * Given a template email message, identify any attachments that are used
@@ -734,7 +780,7 @@ function updateInlineImages(template) {
 
 
 
-//function that loops over all registered people to check if they received a confirmation email
+//loops over all participants, sends confirmation email if paid and if not sent yet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function confirmationEmail(){
 
   if(script_auto_confirm_mails=="yes"){
@@ -757,6 +803,7 @@ function confirmationEmail(){
         if(script_confirm_mail_name != ""){
           if( sendGmailConfirmTemplate(getByName("Email",i+1), subject,i+2))
             registerSheet.getRange(2 + i, script_form_fields_amount + 6).setValue(CONFIRM_MAIL);
+
         }
 
 
@@ -768,7 +815,7 @@ function confirmationEmail(){
   }
 }
 
-//function that loops over all registered people to check if they received a registration email
+//loops over all participants, sends registration email if not sent yet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function registerEmail(){
 
   if(script_auto_registration_mails=="yes"){
@@ -787,6 +834,7 @@ function registerEmail(){
         if(script_registration_mail_name != ""){
           if(sendGmailRegisterTemplate(getByName("Email",i+1), subject,i+2))
             registerSheet.getRange(2 + i, script_form_fields_amount + 6).setValue(REGISTER_MAIL);
+
         }
 
 
@@ -797,6 +845,7 @@ function registerEmail(){
     }
   }
 }
+//sends an email to all participants when clicking extra email button --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendExtraEmail(){
 
 
@@ -816,14 +865,17 @@ function sendExtraEmail(){
 
         if(script_extra_mail_on_pay == "yes" ){
           if(getByName("Paid",i+1)=="yes"){
+
             if(sendGmailExtraTemplate(getByName("Email",i+1), subject,i+2)){
               registerSheet.getRange(2 + i, script_form_fields_amount + 7).setValue(EXTRA_MAIL);
+
 
             }
           }
         }else{
           if(sendGmailExtraTemplate(getByName("Email",i+2), subject,i))
             registerSheet.getRange(2 + i, script_form_fields_amount + 7).setValue(EXTRA_MAIL);
+
         }
       }
 
@@ -835,7 +887,7 @@ function sendExtraEmail(){
   }
 }
 
-//function that loops over all registered people to check if they received a confirmation email
+//sends confirmation email to the participant in row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendconfirmationEmail(row){
 
   if(script_auto_confirm_mails=="yes"){
@@ -854,6 +906,7 @@ function sendconfirmationEmail(row){
       if(script_confirm_mail_name != ""){
         if( sendGmailConfirmTemplate(getByName("Email",row-1), subject,row))
           registerSheet.getRange(row, script_form_fields_amount + 6).setValue(CONFIRM_MAIL);
+
       }
 
 
@@ -865,6 +918,7 @@ function sendconfirmationEmail(row){
   }
 }
 
+//constructs confirmation email template and sends it --------------------------------------------------------------------------------------------------------------------------------------------------------//
 /**
 * Insert the given email body text into an email template, and send
 * it to the indicated recipient. The template is a draft message with
@@ -913,6 +967,7 @@ function sendGmailConfirmTemplate(recipient, subject,i, options) {
 
 
 
+//sends a registration email to the participant in row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendRegisterEmail(row){
 
   if(script_auto_registration_mails=="yes"){
@@ -928,6 +983,7 @@ function sendRegisterEmail(row){
       if(script_registration_mail_name != ""){
         if( sendGmailRegisterTemplate(getByName("Email",row-1), subject,row))
           registerSheet.getRange(row, script_form_fields_amount + 6).setValue(REGISTER_MAIL);
+
       }
 
 
@@ -939,6 +995,7 @@ function sendRegisterEmail(row){
   }
 }
 
+//constructs registration email and sends it --------------------------------------------------------------------------------------------------------------------------------------------------------//
 /**
 * Insert the given email body text into an email template, and send
 * it to the indicated recipient. The template is a draft message with
@@ -995,6 +1052,7 @@ function sendGmailRegisterTemplate(recipient, subject,i, options) {
 
 
 
+//constructs extra email template and sends it --------------------------------------------------------------------------------------------------------------------------------------------------------//
 /**
 * Insert the given email body text into an email template, and send
 * it to the indicated recipient. The template is a draft message with
@@ -1038,7 +1096,7 @@ function sendGmailExtraTemplate(recipient, subject,i, options) {
 
 
 
-//Generates a link for PayPal payments
+//Generates the PayPal payment url [paypal_link] --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makePayPalLink(Firstname,lastname,row){
 
   var price =calculatePrice(row);
@@ -1062,7 +1120,7 @@ function makePayPalLink(Firstname,lastname,row){
 }
 
 
-//Generates the bank transfer details
+//Generates the bank transfer details [bank_transfer] --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeBankTransferDetails(){
   var details = "";
   var accountOwner = finance_bank_owner;
@@ -1076,7 +1134,7 @@ function makeBankTransferDetails(){
   return details;
 }
 
-//Generates the cash payment details
+//Generates the cash payment details [office] --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeCashDetails(){
 
 
@@ -1087,6 +1145,7 @@ function makeCashDetails(){
 }
 
 
+//Replace Terms in Email --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function replaceTerms(message,i){
 
   var columnrange =registerSheet.getRange(1, 1, 1, script_form_fields_amount + 7);
@@ -1146,9 +1205,7 @@ function replaceTerms(message,i){
 
 
 
-//tutorial button functions under here
-
-//tutorial 1 events fields -- update in Git
+//tutorial step 1: Event fields --------------------------------------------------------------------------------------------------------------------------------------------------------// 
 function tutorial_event_fields(){
 SpreadsheetApp.setActiveSheet(optionSheet);
  var range = optionSheet.getRange("B3:B11");
@@ -1171,6 +1228,8 @@ range.setBackground('Red');
   optionSheet.getRange('B44').setValue(tutorial);
 
 }
+
+//tutorial step 2: Form questions --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function tutorial_form_questions(){
   SpreadsheetApp.setActiveSheet(optionSheet);
   var range = optionSheet.getRange("J1:M35");
@@ -1231,6 +1290,8 @@ SpreadsheetApp.setActiveRange(range);
 
   optionSheet.getRange('B44').setValue(tutorial);
 }
+
+//tutorial step 3: Prices --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function tutorial_price_fields(){
   SpreadsheetApp.setActiveSheet(optionSheet);
   var range = optionSheet.getRange("D1:H19");
@@ -1284,6 +1345,7 @@ SpreadsheetApp.setActiveRange(range);
   optionSheet.getRange('B44').setValue(tutorial);
 }
 
+//tutorial step 4: Script options --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function tutorial_script_options(){
   SpreadsheetApp.setActiveSheet(optionSheet);
   var range = optionSheet.getRange("A17:B30");
@@ -1334,6 +1396,8 @@ SpreadsheetApp.setActiveRange(range);
   }
   optionSheet.getRange('B44').setValue(tutorial);
 }
+
+//tutorial step 5: Financial options --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function tutorial_finance_options(){
   SpreadsheetApp.setActiveSheet(financeSheet);
 
@@ -1383,11 +1447,14 @@ SpreadsheetApp.setActiveRange(range);
   }
   optionSheet.getRange('B44').setValue(tutorial);
 }
+
+//tutorial step 6: Finished --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function tutorial_done(){
   showAlert('tutorial','You are now done with the tutorial, all that you still have to do is click create form! ');
   tutorial =0;
   optionSheet.getRange('B44').setValue(tutorial);
 }
+//make message with text input --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function showPrompt(title,message){
   var ui = SpreadsheetApp.getUi();
   var response = ui.prompt(title,message, ui.ButtonSet.YES_NO);
@@ -1401,6 +1468,7 @@ function showPrompt(title,message){
 }
 
 
+//Make message with Yes/No, no input --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function showAlert(title,message) {
   var ui = SpreadsheetApp.getUi(); // Same variations.
 
@@ -1423,6 +1491,7 @@ function showAlert(title,message) {
   }
 }
 
+//tutorial switch --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function turotial_devider(){
 
   switch (tutorial)  {
@@ -1449,7 +1518,7 @@ function turotial_devider(){
 
 }
 
-//cheks if the date of today is equal to the end date given in the sheet
+//check if the registration end date equals to todays date --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function checkEndDate(){
   var enddate =optionSheet.getRange('B30').getValue();
   if(enddate !=null){
@@ -1467,6 +1536,9 @@ function checkEndDate(){
 }
 
 
+
+
+//Count the amount of paid participants --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function countParticipants(){
   var dataRange = registerSheet.getRange(2, script_form_fields_amount+2, registerSheet.getLastRow() -1, script_form_fields_amount + 2); // let it read more columns than are being used, it might mess up otherwise
   // Fetch values for each row in the Range.
@@ -1489,7 +1561,7 @@ function countParticipants(){
 }
 
 
-//update all sheet variables in case of changes while using the sheet
+//Update all variables taken from the sheet and triggers --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function updateVariables(){
   // event variables
   event_title = optionSheet.getRange('B3').getValue();
@@ -1550,9 +1622,26 @@ function updateVariables(){
   makeTriggers();
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Add participant to print list --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function addToPrintList(row){
   printSheet.appendRow([getByName("First name",row-1), getByName("Surname", row -1), getByName("ESNSection",row -1)]);
 };
+
+
+//Clear the print list and add a header --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makePrintList(){
   printSheet.clearContents();
 
@@ -1565,14 +1654,10 @@ function makePrintList(){
 
 }
 
+//Remake the print list with all participants --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function refreshPrintList(){
 
   printSheet.clearContents();
-
-
-
-
-
 
 
   var dataRange = registerSheet.getRange(2, 1, registerSheet.getLastRow() -1, script_form_fields_amount  + 6); // let it read more columns than are being used, it might mess up otherwise
@@ -1596,9 +1681,11 @@ function refreshPrintList(){
 
 
 }
+//Remove participant from print list --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function removeFromPrintList(rowId){
   var firstName = getByName("First name",rowId-1);
   var lastName = getByName("Surname", rowId -1);
+
 
   var destData = printSheet.getRange(1, 1, printSheet.getLastRow(),5);
   var data = destData.getValues();
@@ -1613,22 +1700,14 @@ function removeFromPrintList(rowId){
     }
   }
 }
-
+//Update form questions --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function editFormItem() {
   var form = FormApp.openById(optionSheet.getRange('B37').getValue())
   var allItems = form.getItems();
 
-
-
-
-
   var questions = getAllQuestions();
 
-
-
   for (var i = 0; i < questions.length; ++i) {
-
-
 
     var row = questions[i];
     row[1] = row[1].toLowerCase();
@@ -1705,6 +1784,7 @@ function editFormItem() {
 }
 
 
+//Check array of form questions --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function checkInArrayFormQuestions(array, term){
   var result;
   for( var i = 0, len = array.length; i < len; i++ ) {
@@ -1718,6 +1798,7 @@ function checkInArrayFormQuestions(array, term){
   return null;
 }
 
+//check array of questions optionSheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function checkArrayQuestion(array,question){
   var result=false;
   for( var i = 0, len = array.length; i < len; i++ ) {
@@ -1731,7 +1812,8 @@ function checkArrayQuestion(array,question){
   return result;
   
 }
-//adds a dsgvo required radiobutton to the selected form.
+
+//Adds DSGVO form question to every form --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function dsgvo(form){
 
   var dsgvo_choices="I hereby agree that my data will be processed by ESN Vienna and its members during the process of this event";
