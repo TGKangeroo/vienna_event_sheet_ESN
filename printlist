@@ -1,0 +1,64 @@
+
+//Add participant to print list --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function addToPrintList(row){
+  printSheet.appendRow([getByName("First name",row), getByName("Surname", row), getByName("ESNSection",row)]);
+}
+
+//Clear the print list and add a header --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function makePrintList(){
+  printSheet.clearContents();
+
+
+  printSheet.appendRow(["First name", "Surname", "ESNSection", "Phone nr"]);
+  printSheet.setFrozenRows(1);
+
+
+  optionSheet.getRange("B14").setValue("yes");
+
+}
+
+//Remake the print list with all participants --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function refreshPrintList(){
+
+  printSheet.clearContents();
+
+  var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount  + 6); // let it read more columns than are being used, it might mess up otherwise
+  // Fetch values for each row in the Range.
+  var data = dataRange.getValues();
+
+  printSheet.appendRow(["First name", "Surname", "ESNSection"]);
+  printSheet.setFrozenRows(1);
+  for (var i = 1; i < data.length; ++i) {
+
+    var row = data[i];
+
+
+    if(getByName("Paid",i)=="yes"){
+
+      printSheet.appendRow([row[0], row[1], getByName("ESNSection",i)]);
+
+    }
+
+  }
+
+
+}
+
+//Remove participant from print list --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function removeFromPrintList(rowId){ 
+  var firstName = getByName("First name",rowId);
+  var lastName = getByName("Surname", rowId );
+
+  var destData = printSheet.getRange(1, 1, printSheet.getLastRow(),5);
+  var data = destData.getValues();
+
+  // Find coordinates of the row where value of cell A40 matches a cell in A:A in second spreadsheet
+  for (var rowIndex=0; rowIndex < event_max_participants+5; rowIndex++) {
+    var row2= data[rowIndex];
+    if (firstName == row2[0] && lastName == row2[1]) {
+      // Found our match
+      printSheet.deleteRow(rowIndex +1);
+      break; // Done, exit loop
+    }
+  }
+}
