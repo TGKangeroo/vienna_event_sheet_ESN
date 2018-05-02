@@ -1,0 +1,101 @@
+//Stops accepting responses to the google form --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function closeForm(){
+  var form = FormApp.openByUrl(optionSheet.getRange('B35').getValue());
+  
+  form.setAcceptingResponses(false);
+  form.setCustomClosedFormMessage("I'm sorry but we're currently not taking anymore registrations. This means that either we've reached the maximum amount of participants, or the registration deadline has passed.");
+  
+}
+
+//Opens the google form for responses --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function openForm(){
+  var form = FormApp.openByUrl(optionSheet.getRange('B35').getValue());
+  
+  form.setAcceptingResponses(true);
+}
+
+//Make google form ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+function makeForm(){
+  
+  if(script_form_made!="yes"){
+    form = FormApp.create(event_title)
+    .setDescription(event_description)
+    .setConfirmationMessage('Thanks for registering!')
+    .setAllowResponseEdits(false)
+    .setAcceptingResponses(true)
+    .setRequireLogin(false);
+    
+    var questions = getAllQuestions();
+    
+    for (var i = 0; i < questions.length; ++i) {
+      
+      var row = questions[i];
+      row[1] = row[1].toLowerCase(); 
+      var required;
+      if (row[3] == "TRUE" || row[3] == "true" || row[3] == true ){
+        required = true;
+        
+      }else{
+        required = false;
+      }
+      if(row[1] == "text"){
+        makeTextItem(form,row[0],row[4],required);
+      }
+      if(row[1] == "email"){
+        makeEmailItem(form,row[0],row[4],required);
+      }
+      if(row[1] == "dropdown"){
+        makeDropdownItem(form,row[0],row[4],row[2].split(','),required);
+      }
+      if(row[1] == "checkbox"){
+        makeCheckBoxItem(form,row[0],row[4],row[2].split(','),required);
+      }
+      if(row[1] == "radiobutton"){
+        makeRadioButtonItem(form,row[0],row[4],row[2].split(','),required);
+      }
+      if(row[1] == "date"){
+        makeDateItem(form,row[0],row[4],required);
+      }
+      if(row[1] == "time"){
+        makeTimeItem(form,row[0],row[4],required);
+      }
+      if(row[1] == "datetime"){
+        makeDateTimeItem(form,row[0],row[4],required);
+      }
+      if(row[1] == "duration"){
+        makeDurationItem(form,row[0],row[4],required);
+      }
+      
+      
+      
+      
+      
+    }
+    //add dsgvo confirmation as last question
+    dsgvo(form);
+    form.setDestination(FormApp.DestinationType.SPREADSHEET,ss.getId());
+    makeTriggers();
+    
+    //Sheet and form sharing permissions 
+    var thisSheet = DriveApp.getFileById(ss.getId());
+	thisSheet.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT)
+    
+    var thisForm = DriveApp.getFileById(form.getId());
+	thisForm.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT)
+    
+    //sharingIsCaring(Form);
+    optionSheet.getRange('B15').setValue(""); 
+    optionSheet.getRange("B34").setValue(form.getPublishedUrl());
+    optionSheet.getRange("B35").setValue(form.getEditUrl());
+    optionSheet.getRange("B36").setValue(ss.getUrl());
+    //make it refresh
+    
+    optionSheet.getRange('B16').setValue("yes"); 
+    optionSheet.getRange('B37').setValue(form.getId());
+    optionSheet.getRange('A37').setValue("Form ID");
+    makePrintList();
+    SpreadsheetApp.flush();
+  }else{
+    showAlert('form already made', "You've already made a form in this sheet. Please make a new sheet. If this sheet is already new, please delete the 'yes' in cell B16");
+  }
+}
