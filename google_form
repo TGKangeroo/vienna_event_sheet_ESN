@@ -73,6 +73,12 @@ function makeForm(){
     }
     //add dsgvo confirmation as last question
     dsgvo(form);
+    
+    SpreadsheetApp.flush();
+    
+    //add cancellation policy as last question
+    addCancellationPolicy(form);
+    
     form.setDestination(FormApp.DestinationType.SPREADSHEET,ss.getId());
     makeTriggers();
     
@@ -98,4 +104,18 @@ function makeForm(){
   }else{
     showAlert('form already made', "You've already made a form in this sheet. Please make a new sheet. If this sheet is already new, please delete the 'yes' in cell B16");
   }
+}
+
+//Opens the google form for responses --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function addCancellationPolicy(form){
+  var cancellation_choices="I hereby agree to the cancellation policy";
+//var choices="I hereby agree that my data will be processed by ESN Vienna and its members in accordance with <a href='" +  dsgvo_link + "'>the data protection rules of ESN Austria</a>";
+ var cancellation_description="Cancellation with 100% refund is possible up to 14 days before the beginning of the event. It is allowed to pass a paid spot under the same conditions to another person up to 24h before the beginning of the event via emailing the organizers.";
+makeRadioButtonItem(form,"Cancellation Policy",cancellation_description,cancellation_choices.split(','),true )
+script_form_fields_amount = optionSheet.getRange('B30').getValue();
+      optionSheet.getRange( script_form_fields_amount+4,10).setValue("Cancellation Policy");
+      optionSheet.getRange(script_form_fields_amount+4,11).setValue('radiobutton');
+      optionSheet.getRange(script_form_fields_amount+4,13).setValue('TRUE');
+      optionSheet.getRange(script_form_fields_amount+4,12).setValue(dsgvo_choices);
+      optionSheet.getRange(script_form_fields_amount+4,14).setValue(dsgvo_description);
 }
