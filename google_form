@@ -1,6 +1,6 @@
 //Stops accepting responses to the google form --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function closeForm(){
-  var form = FormApp.openByUrl(optionSheet.getRange('B35').getValue());
+  var form = FormApp.openByUrl(optionSheet.getRange('B36').getValue());
   
   form.setAcceptingResponses(false);
   form.setCustomClosedFormMessage("I'm sorry but we're currently not taking anymore registrations. This means that either we've reached the maximum amount of participants, or the registration deadline has passed.");
@@ -9,7 +9,7 @@ function closeForm(){
 
 //Opens the google form for responses --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function openForm(){
-  var form = FormApp.openByUrl(optionSheet.getRange('B35').getValue());
+  var form = FormApp.openByUrl(optionSheet.getRange('B36').getValue());
   
   form.setAcceptingResponses(true);
 }
@@ -71,7 +71,7 @@ function makeForm(){
       
       
     }
-    //add dsgvo confirmation as last question
+    //add dsgvo confirmation as second last question
     dsgvo(form);
     
     SpreadsheetApp.flush();
@@ -90,19 +90,19 @@ function makeForm(){
 	thisForm.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT)
     
     //sharingIsCaring(Form);
-    optionSheet.getRange('B15').setValue(""); 
-    optionSheet.getRange("B34").setValue(form.getPublishedUrl());
-    optionSheet.getRange("B35").setValue(form.getEditUrl());
-    optionSheet.getRange("B36").setValue(ss.getUrl());
+    optionSheet.getRange('B16').setValue(""); 
+    optionSheet.getRange("B35").setValue(form.getPublishedUrl());
+    optionSheet.getRange("B36").setValue(form.getEditUrl());
+    optionSheet.getRange("B37").setValue(ss.getUrl());
     //make it refresh
     
-    optionSheet.getRange('B16').setValue("yes"); 
-    optionSheet.getRange('B37').setValue(form.getId());
-    optionSheet.getRange('A37').setValue("Form ID");
+    optionSheet.getRange('B17').setValue("yes"); 
+    optionSheet.getRange('B38').setValue(form.getId());
+    optionSheet.getRange('A38').setValue("Form ID");
     makePrintList();
     SpreadsheetApp.flush();
   }else{
-    showAlert('form already made', "You've already made a form in this sheet. Please make a new sheet. If this sheet is already new, please delete the 'yes' in cell B16");
+    showAlert('form already made', "You've already made a form in this sheet. Please make a new sheet. If this sheet is already new, please delete the 'yes' in cell B17");
   }
 }
 
