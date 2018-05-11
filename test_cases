@@ -8,7 +8,9 @@ function fillingInOptionSheet() {
   optionSheet.getRange("B9").setValue('in my backyard');
   optionSheet.getRange("B10").setValue('50');
   optionSheet.getRange("B11").setValue('yes');
-  optionSheet.getRange("B31").setValue(new Date() +1);
+  var today=new Date();
+  today.setDate(today.getDate()+1);
+  optionSheet.getRange("B31").setValue(today);
   
   
   
