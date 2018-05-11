@@ -15,7 +15,7 @@ function makeTriggers(){
 
 
 
-  var enddate =  Utilities.formatDate(new Date(optionSheet.getRange('B30').getValue()), "Europe/Vienna", "dd-yyyy-MM");
+  var enddate =  Utilities.formatDate(new Date(optionSheet.getRange('B31').getValue()), "Europe/Vienna", "dd-yyyy-MM");
   var today =  Utilities.formatDate(new Date(), "Europe/Vienna", "dd-yyyy-MM");
 
   if(today !=enddate && today <enddate){
@@ -55,8 +55,8 @@ function onEdit(e){
   var amount_total_part=0;
   //check if the changed value is on the paid row and if it's changed to yes
   if(range.getColumn() == script_form_fields_amount + 2 && e.value =="yes" && editedSheet.getName()==registerSheet.getName()){
-    optionSheet.getRange('F17').setValue(countParticipants()); 
-    amount_total_part = optionSheet.getRange('F17').getValue();
+    optionSheet.getRange('F18').setValue(countParticipants()); 
+    amount_total_part = optionSheet.getRange('F18').getValue();
     if(amount_total_part > event_max_participants){
       answer = showAlert('Warning max participants reached',"If you accept this person you're over your max amount of participants!");
     }
@@ -104,7 +104,7 @@ function onEdit(e){
           
           
       }
-      optionSheet.getRange('F17').setValue(countParticipants()); 
+      optionSheet.getRange('F18').setValue(countParticipants()); 
     }
     
     
@@ -151,7 +151,7 @@ function onSubmit(e){
   cell.setDataValidation(rule);
   event_max_participants = optionSheet.getRange('B10').getValue();
   var amount_total_part=0;
-  amount_total_part = optionSheet.getRange('F17').getValue();
+  amount_total_part = optionSheet.getRange('F18').getValue();
   if(event_isPaid=="yes"){
     if(cell.getValue() !="cancelled" && cell.getValue() !="refunded"){
       cell.setValue('no');
@@ -160,7 +160,7 @@ function onSubmit(e){
   }else{
     cell.setValue('yes');
     
-    optionSheet.getRange('F17').setValue(countParticipants()); 
+    optionSheet.getRange('F18').setValue(countParticipants()); 
     
     if(script_auto_confirm_mails=="yes"){
       sendconfirmationEmail(row_script);
