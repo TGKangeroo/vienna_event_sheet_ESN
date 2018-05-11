@@ -8,7 +8,7 @@ function fillingInOptionSheet() {
   optionSheet.getRange("B9").setValue('in my backyard');
   optionSheet.getRange("B10").setValue('50');
   optionSheet.getRange("B11").setValue('yes');
-  optionSheet.getRange("B30").setValue(new Date() +1);
+  optionSheet.getRange("B31").setValue(new Date() +1);
   
   
   
@@ -63,7 +63,7 @@ function option_wESNcard(){
 optionSheet.getRange("D5").setValue('price with ESNcard');
 optionSheet.getRange("D6").setValue('price without ESNcard');
   
-   optionSheet.getRange("E5").setValue('20');
+   optionSheet.getRange("E5").setValue('21');
   optionSheet.getRange("E6").setValue('22');
   
 optionSheet.getRange("G5").setValue('ESNcard');
@@ -158,9 +158,9 @@ function addTestFormRequestsnESNcard(){
 
 
 function test_sendregisterMail(){
- optionSheet.getRange("B21").setValue('yes');
-  optionSheet.getRange("B22").setValue('test_register');
-  optionSheet.getRange("B23").setValue('no');
+ optionSheet.getRange("B22").setValue('yes');
+  optionSheet.getRange("B23").setValue('test_register');
+  optionSheet.getRange("B24").setValue('no');
   
   sendRegisterEmail(1);
   sendRegisterEmail(3);
@@ -168,23 +168,23 @@ function test_sendregisterMail(){
 
 function test_sendconfirmMail(){
 
- optionSheet.getRange("B19").setValue('yes');
-  optionSheet.getRange("B20").setValue('test_confirm');
+ optionSheet.getRange("B20").setValue('yes');
+  optionSheet.getRange("B21").setValue('test_confirm');
   
   sendconfirmationEmail(1);
   sendconfirmationEmail(3);
 }
 
 function test_extraMail_onPaid(){
-optionSheet.getRange("B24").setValue('test_extra');
-optionSheet.getRange("B25").setValue('yes');
+optionSheet.getRange("B25").setValue('test_extra');
+optionSheet.getRange("B26").setValue('yes');
   
   sendExtraEmail();
 }
 
 function test_extraMail(){
-optionSheet.getRange("B24").setValue('test_extra');
-  optionSheet.getRange("B25").setValue('no');
+optionSheet.getRange("B25").setValue('test_extra');
+  optionSheet.getRange("B26").setValue('no');
   
   sendExtraEmail();
 }
