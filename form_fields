@@ -1,6 +1,15 @@
 //Make form question with email input field --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makeEmailItem(form,title,Description,required,item){
-  item = makeTextItem(form,title,Description,required,item);
+      if(item == null){
+    item = form.addTextItem();
+    item.setRequired(required);
+  }
+  item.setTitle(title)
+  .setHelpText(Description);
+  var emailValidation = FormApp.createTextValidation()
+    .requireTextIsEmail()
+    .build();
+  item.setValidation(emailValidation)
   var emailValidation = FormApp.createTextValidation()
     .requireTextIsEmail()
     .build();
