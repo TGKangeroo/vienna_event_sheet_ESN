@@ -97,7 +97,7 @@ function totalPriceToBePaid(row){
   
   
 var price=calculatePrice(row)
-registerSheet.getRange(row+1,script_form_fields_amount + 4).setValue(price);
+registerSheet.getRange(row+1,script_form_fields_amount + 3).setValue(price);
 }
 
 
