@@ -10,9 +10,9 @@ function dsgvo(form){
  var dsgvo_description="We will use this data only for this event and will only pass the data in context of this event if it's absolutly necessary (e.g. to a Hostel). The data will not be used or passed to a third party outside of the context of this event.";
 makeRadioButtonItem(form,"Data processing",dsgvo_description,dsgvo_choices.split(','),true )
 script_form_fields_amount = optionSheet.getRange('B30').getValue();
-      optionSheet.getRange( script_form_fields_amount+4,10).setValue("Data processing");
-      optionSheet.getRange(script_form_fields_amount+4,11).setValue('radiobutton');
-      optionSheet.getRange(script_form_fields_amount+4,13).setValue('TRUE');
-      optionSheet.getRange(script_form_fields_amount+4,12).setValue(dsgvo_choices);
-      optionSheet.getRange(script_form_fields_amount+4,14).setValue(dsgvo_description);
+      optionSheet.getRange( script_form_fields_amount+5,10).setValue("Data processing");
+      optionSheet.getRange(script_form_fields_amount+5,11).setValue('radiobutton');
+      optionSheet.getRange(script_form_fields_amount+5,13).setValue('TRUE');
+      optionSheet.getRange(script_form_fields_amount+5,12).setValue(dsgvo_choices);
+      optionSheet.getRange(script_form_fields_amount+5,14).setValue(dsgvo_description);
 }
