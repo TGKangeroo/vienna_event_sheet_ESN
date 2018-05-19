@@ -97,7 +97,7 @@ function totalPriceToBePaid(row){
   
   
 var price=calculatePrice(row)
-registerSheet.getRange(row+1,script_form_fields_amount + 3).setValue(price);
+registerSheet.getRange(row+1,script_form_fields_amount + 4).setValue(price);
 }
 
 
@@ -111,7 +111,7 @@ function makePayAndEditedRow(){
   var secondcell = registerSheet.getRange(1,script_form_fields_amount +3);
   secondcell.setValue('last Edited');
   
-  var thirdcell = registerSheet.getRange(1,script_form_fields_amount +3);
+  var thirdcell = registerSheet.getRange(1,script_form_fields_amount +4);
   secondcell.setValue('to be paid');
   
   optionSheet.getRange('B16').setValue("yes");
