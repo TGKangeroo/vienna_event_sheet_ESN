@@ -10,7 +10,9 @@ var budgetSheet = ss.getSheetByName("Budget");
 
 
 
+if(ss.getSheets()[0].getName() != registerSheet.getName()){
 var registerSheet = ss.getSheets()[0];
+}
 
 
 
