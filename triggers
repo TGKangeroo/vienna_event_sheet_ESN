@@ -120,7 +120,7 @@ function onEdit(e){
   }
   
   if(editedSheet.getName()==registerSheet.getName()){
-   totalPriceToBePaid(row);
+   totalPriceToBePaid(row_script);
   }
  
   updatePrices();
@@ -182,7 +182,7 @@ function onSubmit(e){
   }
   
   if(editedSheet.getName()==registerSheet.getName()){
-   totalPriceToBePaid(row);
+   totalPriceToBePaid(row_script);
   }
  
   SpreadsheetApp.flush();
