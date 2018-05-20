@@ -9,11 +9,9 @@ var financeSheet = ss.getSheetByName("Finances");
 var budgetSheet = ss.getSheetByName("Budget");
 
 
-
-if(ss.getSheets()[0].getName() != registerSheet.getName()){
+if(ss.getSheets()[0].getName() != optionSheet.getName()){
 var registerSheet = ss.getSheets()[0];
 }
-
 
 
 //variables for event information (Blue block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
