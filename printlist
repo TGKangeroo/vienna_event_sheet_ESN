@@ -1,53 +1,70 @@
 
 //Add participant to print list --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function addToPrintList(row){
-  printSheet.appendRow([getByName("First name",row), getByName("Surname", row), getByName("ESNSection",row)]);
+  
+  var printSheetRange= printSheet.getRange(1,1,1,printSheet.getLastColumn());
+  var printSheetColumns = printSheetRange.getValues();
+  
+  var printrow=[];
+  for(var i=0;i<printSheet.getLastColumn();i++){
+  printrow[i]=getByName(printSheetColumns[0][i],row);
+  
+  }
+  
+  
+  printSheet.appendRow(printrow);
 }
 
 //Clear the print list and add a header --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makePrintList(){
-  printSheet.clearContents();
-
-
-  printSheet.appendRow(["First name", "Surname", "ESNSection", "Phone nr"]);
-  printSheet.setFrozenRows(1);
-
-
-  optionSheet.getRange("B15").setValue("yes");
+cleanList();
+  optionSheet.getRange("B16").setValue("yes");
 
 }
 
+function cleanList(){
+var start, end;
+start = 2;
+end = printSheet.getLastRow() - 1;//Number of last row with content
+      //blank rows after last row with content will not be deleted
+printSheet.deleteRows(start, end);
+
+}
 //Remake the print list with all participants --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function refreshPrintList(){
 
-  printSheet.clearContents();
-
-  var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount  + 6); // let it read more columns than are being used, it might mess up otherwise
-  // Fetch values for each row in the Range.
-  var data = dataRange.getValues();
-
-  printSheet.appendRow(["First name", "Surname", "ESNSection"]);
-  printSheet.setFrozenRows(1);
-  for (var i = 1; i < data.length; ++i) {
-
-    var row = data[i];
+  cleanList();
+var printSheetRange= printSheet.getRange(1,1,1,printSheet.getLastColumn());
+  var printSheetColumns = printSheetRange.getValues();
+  
+  
 
 
-    if(getByName("Paid",i)=="yes"){
-
-      printSheet.appendRow([row[0], row[1], getByName("ESNSection",i)]);
-
-    }
-
+  for (var y = 1; y < registerSheet.getLastRow() ; ++y) {
+  var printrow=[];
+   
+      for(var i=0;i<printSheet.getLastColumn();i++){
+  printrow[i]=getByName(printSheetColumns[0][i],y);
+ // printrow[i]='hello';
   }
+    
 
+
+    
+printSheet.appendRow(printrow);
+  }
+ 
 
 }
 
 //Remove participant from print list --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function removeFromPrintList(rowId){ 
-  var firstName = getByName("First name",rowId);
-  var lastName = getByName("Surname", rowId );
+  
+  var printSheetRange= printSheet.getRange(1,1,1,printSheet.getLastColumn());
+  var printSheetColumns = printSheetRange.getValues();
+  
+  var firstName = getByName(printSheetColumns[0][0],rowId);
+  var lastName = getByName(printSheetColumns[0][1],rowId);
 
   var destData = printSheet.getRange(1, 1, printSheet.getLastRow(),5);
   var data = destData.getValues();
