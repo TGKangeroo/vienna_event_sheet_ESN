@@ -6,6 +6,9 @@ var EXTRA_MAIL = "extra sent";
 
 
 function sendEmail(row,type){
+  
+  var  script_confirm_mail_name= getFieldValue('script_confirm_mail_name');
+  var script_registration_mail_name= getFieldValue('script_registration_mail_name');
 var data = registerSheet.getRange(row,script_form_fields_amount + 6 , 1, 1).getValues();
 
 
@@ -46,7 +49,9 @@ var Email=getByName("Email",row-1);
 
 //sends confirmation email to the participant in row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendconfirmationEmail(row){
-
+ var  script_confirm_mail_name= getFieldValue('script_confirm_mail_name');
+ var  script_auto_confirm_mails= getFieldValue('script_auto_confirm_mails');
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
   if(script_auto_confirm_mails=="yes"){
     var data = registerSheet.getRange(row+1,script_form_fields_amount + 7 , 1, 1).getValues();
 
@@ -56,7 +61,7 @@ function sendconfirmationEmail(row){
 
 
     if (emailSent != CONFIRM_MAIL && getByName("Email",row) !="" &&  getByName("Paid",row)=="yes") {  // Prevents sending duplicates
-      var subject = "Confirmation " + event_title;
+      var subject = "Confirmation " + getFieldValue('event_title');
 
 
       //if the user has a whole confirm draft
@@ -77,14 +82,16 @@ function sendconfirmationEmail(row){
 
 //sends a registration email to the participant in row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendRegisterEmail(row){
-
+var  script_registration_mail_name = getFieldValue('script_registration_mail_name');
+ var  script_auto_registration_mails= getFieldValue('script_auto_registration_mails');
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
   if(script_auto_registration_mails=="yes"){
     var data = registerSheet.getRange(row+1,script_form_fields_amount + 7 , 1, 1).getValues();
 
 
     var emailSent = data[0];     // column where we can check if the user already got an email
     if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && getByName("Email",row) !="") {  // Prevents sending duplicates
-      var subject = "Registration " + event_title;
+      var subject = "Registration " + getFieldValue('event_title');
 
 
       //if the user has a whole confirm draft
@@ -104,7 +111,16 @@ function sendRegisterEmail(row){
 
 //Merge of looped email functions --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function Email(){
-
+  var  script_confirm_mail_name= getFieldValue('script_confirm_mail_name');
+  var  script_auto_confirm_mails= getFieldValue('script_auto_confirm_mails');
+  
+ var  script_registration_mail_name = getFieldValue('script_registration_mail_name');
+ var  script_auto_registration_mails= getFieldValue('script_auto_registration_mails');
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
+  
+   var  script_extra_mail_name = getFieldValue('script_extra_mail_name');
+ var  script_extra_mail_on_pay= getFieldValue('script_extra_mail_on_pay');
+ 
   
    //redefine the datarange to the registerSheet values
     var dataRange = registerSheet.getRange(2, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 7); // let it read more columns than are being used, it might mess up otherwise
@@ -166,6 +182,11 @@ function Email(){
 //sends an email to all participants when clicking extra email button --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendExtraEmail(){
 
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
+  
+   var  script_extra_mail_name = getFieldValue('script_extra_mail_name');
+ var  script_extra_mail_on_pay= getFieldValue('script_extra_mail_on_pay');
+ 
 
 
   var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 8); // let it read more columns than are being used, it might mess up otherwise
@@ -205,6 +226,15 @@ function sendExtraEmail(){
 //loops over all participants, sends registration email if not sent yet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function registerEmail(){
 
+  
+  
+ var  script_registration_mail_name = getFieldValue('script_registration_mail_name');
+ var  script_auto_registration_mails= getFieldValue('script_auto_registration_mails');
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
+  
+
+ 
+  
   if(script_auto_registration_mails=="yes"){
 
     var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() -1, script_form_fields_amount + 8); // let it read more columns than are being used, it might mess up otherwise
@@ -217,7 +247,7 @@ function registerEmail(){
 
       var emailSent = row[script_form_fields_amount + 6];     // Third column
       if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && getByName("Email",i) !="") {  // Prevents sending duplicates
-        var subject = "Registration " + event_title;
+        var subject = "Registration " + getFieldValue('event_title');
         if(script_registration_mail_name != ""){
           if(sendGmailRegisterTemplate(getByName("Email",i), subject,i))
             registerSheet.getRange(1 + i, script_form_fields_amount + 7).setValue(REGISTER_MAIL);
@@ -235,6 +265,13 @@ function registerEmail(){
 //loops over all participants, sends confirmation email if paid and if not sent yet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function confirmationEmail(){
 
+  var  script_confirm_mail_name= getFieldValue('script_confirm_mail_name');
+  var  script_auto_confirm_mails= getFieldValue('script_auto_confirm_mails');
+  
+ 
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
+
+ 
   if(script_auto_confirm_mails=="yes"){
 
     //redefine the datarange to the registerSheet values
@@ -248,7 +285,7 @@ function confirmationEmail(){
 
       var emailSent = row[script_form_fields_amount + 6];     // column where we can check if the user already got an email
       if (emailSent != CONFIRM_MAIL && getByName("Email",i) !="" &&  getByName("Paid",i)=="yes") {  // Prevents sending duplicates
-        var subject = "Confirmation " + event_title;
+        var subject = "Confirmation " + getFieldValue('event_title');
 
 
         //if the user has a whole confirm draft
@@ -284,6 +321,17 @@ function confirmationEmail(){
 */
 
 function sendGmailTemplate(recipient, i,type, options) {
+  var  script_confirm_mail_name= getFieldValue('script_confirm_mail_name');
+  var  script_auto_confirm_mails= getFieldValue('script_auto_confirm_mails');
+  
+ var  script_registration_mail_name = getFieldValue('script_registration_mail_name');
+ var  script_auto_registration_mails= getFieldValue('script_auto_registration_mails');
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
+  
+   var  script_extra_mail_name = getFieldValue('script_extra_mail_name');
+ var  script_extra_mail_on_pay= getFieldValue('script_extra_mail_on_pay');
+ 
+  
   options = options || {};  // default is no options
 var draftsubject='';
   var drafts = GmailApp.getDraftMessages();
@@ -293,11 +341,11 @@ var subject;
   switch(type){
     case 'confirmation':
       draftsubject=script_confirm_mail_name;
-      subject='Confirmation ' + event_title
+      subject='Confirmation ' + getFieldValue('event_title');
       break;
     case 'registration':
       draftsubject=script_registration_mail_name;
-      subject='Registration ' + event_title
+      subject='Registration ' + getFieldValue('event_title');
       if(script_register_on_pay == "yes"){
     var paymentmethod = getByName("Payment method",i);
     draftsubject = draftsubject + "_" + paymentmethod;
@@ -349,6 +397,14 @@ var subject;
 * @returns        GmailApp   the Gmail service, useful for chaining
 */
 function sendGmailRegisterTemplate(recipient, subject,i, options) {
+
+  
+ var  script_registration_mail_name = getFieldValue('script_registration_mail_name');
+ var  script_auto_registration_mails= getFieldValue('script_auto_registration_mails');
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
+ var script_register_on_pay = getFieldValue('script_register_on_pay');
+  
+  
   options = options || {};  // default is no options
 
   var drafts = GmailApp.getDraftMessages();
@@ -400,6 +456,12 @@ function sendGmailRegisterTemplate(recipient, subject,i, options) {
 * @returns        GmailApp   the Gmail service, useful for chaining
 */
 function sendGmailExtraTemplate(recipient, subject,i, options) {
+
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
+  
+ var  script_extra_mail_name = getFieldValue('script_extra_mail_name');
+ var  script_extra_mail_on_pay= getFieldValue('script_extra_mail_on_pay');
+ 
   options = options || {};  // default is no options
 
   var drafts = GmailApp.getDraftMessages();
@@ -444,6 +506,13 @@ function sendGmailExtraTemplate(recipient, subject,i, options) {
 * @returns        GmailApp   the Gmail service, useful for chaining
 */
 function sendGmailConfirmTemplate(recipient, subject,i, options) {
+  var  script_confirm_mail_name= getFieldValue('script_confirm_mail_name');
+  var  script_auto_confirm_mails= getFieldValue('script_auto_confirm_mails');
+  
+
+ var  script_form_fields_amount= getFieldValue('script_form_fields_amount');
+
+ 
   options = options || {};  // default is no options
 
   var drafts = GmailApp.getDraftMessages();
@@ -526,6 +595,7 @@ function updateInlineImages(template) {
 //Replace Terms in Email --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function replaceTerms(message,i){
 
+  var script_form_fields_amount = getFieldValue('script_form_fields_amount');
   var columnrange =registerSheet.getRange(1, 1, 1, script_form_fields_amount + 7);
   var columnvalues = columnrange.getValues();
 
@@ -537,14 +607,14 @@ function replaceTerms(message,i){
     message.indexOf("[price]")>-1 ||
     message.indexOf("[event_max_participants]")>-1   ){
 
-    message = message.replace('[event_meetingpoint]', event_meetingpoint);
-    message = message.replace('[event_start_date]', Utilities.formatDate(new Date(event_start_date), "Europe/Vienna", "dd/MM/YYYY"));
-    message = message.replace('[event_end_date]', Utilities.formatDate(new Date(event_end_date), "Europe/Vienna", "dd/MM/YYYY"));
+    message = message.replace('[event_meetingpoint]', getFieldValue('event_meetingpoint'));
+    message = message.replace('[event_start_date]', Utilities.formatDate(new Date(getFieldValue('event_start_date')), "Europe/Vienna", "dd/MM/YYYY"));
+    message = message.replace('[event_end_date]', Utilities.formatDate(new Date(getFieldValue('event_end_date')), "Europe/Vienna", "dd/MM/YYYY"));
 
-    message = message.replace('[event_start_time]', event_start_time);
-    message = message.replace('[event_end_time]', event_end_time);
-    message = message.replace('[event_title]', event_title);
-    message = message.replace('[event_max_participants]', event_max_participants);
+    message = message.replace('[event_start_time]', getFieldValue('event_start_time'));
+    message = message.replace('[event_end_time]', getFieldValue('event_end_time'));
+    message = message.replace('[event_title]', getFieldValue('event_title'));
+    message = message.replace('[event_max_participants]', getFieldValue('event_max_participants'));
 
     message = message.replace('[paypal_link]',makePayPalLink( getByName("First name",i), getByName("Surname",i),i));
     message = message.replace('[bank_transfer]',makeBankTransferDetails());
