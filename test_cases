@@ -43,19 +43,19 @@ function fillingInOptionSheet() {
   optionSheet.getRange("K7").setValue('radiobutton');
   optionSheet.getRange("K8").setValue('radiobutton');
   
-  optionSheet.getRange("K4").setValue('');
-  optionSheet.getRange("K5").setValue('');
-  optionSheet.getRange("K6").setValue('');
+  optionSheet.getRange("L4").setValue('');
+  optionSheet.getRange("L5").setValue('');
+  optionSheet.getRange("L6").setValue('');
   
-  optionSheet.getRange("K7").setValue('yes,no');
-  optionSheet.getRange("K8").setValue('yes,no');
+  optionSheet.getRange("L7").setValue('yes,no');
+  optionSheet.getRange("L8").setValue('yes,no');
   
-  optionSheet.getRange("K4").setValue('TRUE');
-  optionSheet.getRange("K5").setValue('TRUE');
-  optionSheet.getRange("K6").setValue('TRUE');
+  optionSheet.getRange("M4").setValue('TRUE');
+  optionSheet.getRange("M5").setValue('TRUE');
+  optionSheet.getRange("M6").setValue('TRUE');
   
-  optionSheet.getRange("K7").setValue('TRUE');
-  optionSheet.getRange("K8").setValue('TRUE');
+  optionSheet.getRange("M7").setValue('TRUE');
+  optionSheet.getRange("M8").setValue('TRUE');
   
   
 }
@@ -76,8 +76,8 @@ optionSheet.getRange("G6").setValue('ESNcard');
   
 optionSheet.getRange("J9").setValue('ESNcard');
 optionSheet.getRange("K9").setValue('radiobutton');
-optionSheet.getRange("K9").setValue('yes,no');
-optionSheet.getRange("K9").setValue('TRUE');
+optionSheet.getRange("L9").setValue('yes,no');
+optionSheet.getRange("M9").setValue('TRUE');
 }
 
 function option_nESNcard(){
