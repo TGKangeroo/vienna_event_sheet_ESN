@@ -1,5 +1,5 @@
 //tutorial variables --------------------------------------------------------------------------------------------------------------------------------------------------------//
-var tutorial = optionSheet.getRange('B44').getValue();
+var tutorial = getFieldValue('tutorial'); 
 
 //tutorial step 1: Event fields --------------------------------------------------------------------------------------------------------------------------------------------------------// 
 function tutorial_event_fields(){
@@ -12,7 +12,7 @@ range.setBackground('Red');
   if (answer1 == "yes"){
     if(showAlert("Extra information step 1", "To get you going the first thing we need to know is do participants have to pay for your event? ")=="yes"){
 
-      optionSheet.getRange('B11').setValue("yes");
+     setFieldValue('event_isPaid','yes'); 
     }
     tutorial++;
   }else{
@@ -21,7 +21,7 @@ range.setBackground('Red');
   }
 
 
-  optionSheet.getRange('B44').setValue(tutorial);
+  setFieldValue('tutorial',tutorial);
 
 }
 
@@ -29,7 +29,7 @@ range.setBackground('Red');
 function tutorial_form_questions(){
   SpreadsheetApp.setActiveSheet(optionSheet);
   var range = optionSheet.getRange("J1:M36");
-
+var script_form_fields_amount = getFieldValue('script_form_fields_amount');
 SpreadsheetApp.setActiveRange(range);
   var answer1 = showAlert("Step 2","Let's take a look at the questions you'd like to have in your form.");
   if (answer1 == "yes"){
@@ -49,7 +49,7 @@ SpreadsheetApp.setActiveRange(range);
     }
     var answer2 = showAlert("ESNcard","Is there a difference in payment for ESNcard and no ESNcard?");
     if(answer2 =="yes"){
-      script_form_fields_amount = optionSheet.getRange('B30').getValue();
+      script_form_fields_amount = getFieldValue('script_form_fields_amount');
       optionSheet.getRange( script_form_fields_amount+4,10).setValue("ESNcard");
       optionSheet.getRange(script_form_fields_amount+4,11).setValue('radiobutton');
       optionSheet.getRange(script_form_fields_amount+4,13).setValue('TRUE');
@@ -59,7 +59,7 @@ SpreadsheetApp.setActiveRange(range);
     var answer3= showAlert("payment types","Are there multiple ways to pay?");
 
     if(answer3 =="yes"){
-      script_form_fields_amount = optionSheet.getRange('B30').getValue();
+      script_form_fields_amount = getFieldValue('script_form_fields_amount');
       optionSheet.getRange( script_form_fields_amount+4,10).setValue("Payment method");
       optionSheet.getRange(script_form_fields_amount+4,11).setValue('radiobutton');
       optionSheet.getRange(script_form_fields_amount+4,13).setValue('TRUE');
@@ -69,7 +69,7 @@ SpreadsheetApp.setActiveRange(range);
     }
     SpreadsheetApp.flush();
     var answer6 = answer6 = showAlert("Step 2","Are there any other questions you'd like to add?");
-    script_form_fields_amount = optionSheet.getRange('B30').getValue();
+    script_form_fields_amount = getFieldValue('script_form_fields_amount');
     if(answer6 =="yes"){
      var answer6 = answer6 = showAlert("Step 2","You have to do this in the pink area, Use the questions above as an example!");
 
@@ -84,7 +84,7 @@ SpreadsheetApp.setActiveRange(range);
       tutorial++;
   }
 
-  optionSheet.getRange('B44').setValue(tutorial);
+   setFieldValue('tutorial',tutorial);
 }
 
 //tutorial step 3: Prices --------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -138,7 +138,7 @@ SpreadsheetApp.setActiveRange(range);
       tutorial++;
   }
 
-  optionSheet.getRange('B44').setValue(tutorial);
+   setFieldValue('tutorial',tutorial);
 }
 
 //tutorial step 4: Script options --------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -152,45 +152,47 @@ SpreadsheetApp.setActiveRange(range);
   if (answer1 == "yes"){
     var answer2= showAlert("Automatic emails", "Would you like to send an automatic email once someone has paid? Or if it's a free event, once they've registered");
     if(answer2== "yes"){
-      optionSheet.getRange('B20').setValue("yes");
-      optionSheet.getRange('B21').setValue(showPrompt("Automatic email","For the sheet to know which email to send, you have to make an Email in your inbox and save it as a draft. We can't do this for you, but I'm sure you can work with your own inbox! This email has to be saved on the same account as the one that will use this sheet.Please fill in the subject of the email you just made or will make afterwards"));
-
+       setFieldValue('script_auto_confirm_mails','yes');
+      setFieldValue('script_confirm_mail_name',showPrompt("Automatic email","For the sheet to know which email to send, you have to make an Email in your inbox and save it as a draft. We can't do this for you, but I'm sure you can work with your own inbox! This email has to be saved on the same account as the one that will use this sheet.Please fill in the subject of the email you just made or will make afterwards"));
+ 
     }else{
-      optionSheet.getRange('B20').setValue("no");
+       setFieldValue('script_auto_confirm_mails','no');
     }
     SpreadsheetApp.flush();
     var answer3= showAlert("Automatic emails","Would you like the sheet to send automatic emails once someone has registered? If your event is for free, put no here");
     if(answer3== "yes"){
-      optionSheet.getRange('B22').setValue("yes");
-      optionSheet.getRange('B23').setValue(showPrompt("Automatic email","For the sheet to know which email to send, you have to make an Email in your inbox and save it as a draft. We can't do this for you, but I'm sure you can work with your own inbox! This email has to be saved on the same account as the one that will use this sheet.Please fill in the subject of the email you just made or will make afterwards"));
+      setFieldValue('script_auto_registration_mails','yes');
+      setFieldValue('script_registration_mail_name',showPrompt("Automatic email","For the sheet to know which email to send, you have to make an Email in your inbox and save it as a draft. We can't do this for you, but I'm sure you can work with your own inbox! This email has to be saved on the same account as the one that will use this sheet.Please fill in the subject of the email you just made or will make afterwards"));
       var answer10 = showAlert("Automatic registration Email","Do you want to send different emails for each payment option? For example a different email for the ones that would like to pay with PayPal.")
-      optionSheet.getRange('B24').setValue(answer10);
-
+      
+      setFieldValue('script_register_on_pay',answer10);
       if(answer10 =="yes"){
         showAlert("different payment types","To get the different emails on payment type to work you have to make some small adjustments to the email you just saved in your inbox! You have to make one email per payment option. So for example if you called your email 'registration email' and you have a payment option called Office and PayPal. You now have to make two emails : 'registration email_Office' and 'registration email_PayPal'.");
 
       }
 
     }else{
-      optionSheet.getRange('B22').setValue("no");
+       setFieldValue('script_auto_registration_mails','no');
     }
     SpreadsheetApp.flush();
     var answer4=showAlert("Extra emails","When sending an extra email, for example a survival guide, would you like these emails to only be sent to people that paid?");
     if(answer4 =="yes"){
-      optionSheet.getRange('B25').setValue(showPrompt("Extra email","The same counts for the extra email as for the previous two emails! but you can always do this later right before you send the email. But if you already have it ready, please fill in the subject name here."));
-      optionSheet.getRange('B26').setValue('yes');
+      
+      setFieldValue('script_extra_mail_name',showPrompt("Extra email","The same counts for the extra email as for the previous two emails! but you can always do this later right before you send the email. But if you already have it ready, please fill in the subject name here."));
+      setFieldValue('script_extra_mail_on_pay','yes');
+    
     }
-
-    optionSheet.getRange('B27').setValue(showAlert("Sticky names","Would you like the names of the people that registered to be stuck to the side of the screen when scrolling through? I would advice to say no here, it's bad if you'd like to check the sheet on your mobile."));
-    optionSheet.getRange('B28').setValue(showAlert("Closing the form","Would you like the registrations to be closed when reaching the max amount of participants?"));
-    optionSheet.getRange('B29').setValue(showAlert("Coloring people","When someone paid, would you like them to turn green like the Hulk?"));
+setFieldValue('script_sticky_names',showAlert("Sticky names","Would you like the names of the people that registered to be stuck to the side of the screen when scrolling through? I would advice to say no here, it's bad if you'd like to check the sheet on your mobile."));
+ setFieldValue('script_close_form_max_part',showAlert("Closing the form","Would you like the registrations to be closed when reaching the max amount of participants?"));
+ setFieldValue('script_color_on_paid',showAlert("Coloring people","When someone paid, would you like them to turn green like the Hulk?"));
+   
     SpreadsheetApp.flush();
     tutorial++;
   }else{
     
       tutorial++;
   }
-  optionSheet.getRange('B44').setValue(tutorial);
+   setFieldValue('tutorial',tutorial);
 }
 
 //tutorial step 5: Financial options --------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -241,14 +243,14 @@ SpreadsheetApp.setActiveRange(range);
   }else{
       tutorial++;
   }
-  optionSheet.getRange('B44').setValue(tutorial);
+   setFieldValue('tutorial',tutorial);
 }
 
 //tutorial step 6: Finished --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function tutorial_done(){
   showAlert('tutorial','You are now done with the tutorial, all that you still have to do is click create form! ');
   tutorial =0;
-  optionSheet.getRange('B44').setValue(tutorial);
+ setFieldValue('tutorial',tutorial);
 }
 
 //make message with text input --------------------------------------------------------------------------------------------------------------------------------------------------------//
