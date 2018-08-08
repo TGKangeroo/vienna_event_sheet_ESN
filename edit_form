@@ -1,6 +1,6 @@
 //Update form questions --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function editFormItem() {
-  var form = FormApp.openById(optionSheet.getRange('B37').getValue())
+  var form = FormApp.openById(getFieldValue('form_edit_link'));
   var allItems = form.getItems();
 
   var questions = getAllQuestions();
