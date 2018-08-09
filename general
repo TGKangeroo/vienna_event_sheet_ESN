@@ -141,7 +141,7 @@ function getByName(colName, row ) {
 
 //updates the amount field 30B --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function updatePrices(){
-
+var script_form_fields_amount= getFieldValue('script_form_fields_amount');
   var prices = getAllPrices();
   for (var i = 0; i < prices.length;i++){
     prices[i][2] = 0;
