@@ -1,10 +1,5 @@
-
-
-
+// Function for processing the data from eventInformationForm.html -----------------------------------------------------------------------------------------------------------------------------------
 function postFormDataToSheetEventInformation(e){
-
-
-  // Create a 'Responses' sheet if it does not exist.
  setFieldValue('event_title',e.event_title);
   setFieldValue('event_description',e.event_description);
   setFieldValue('event_start_date',e.event_start_date);
@@ -19,9 +14,12 @@ function postFormDataToSheetEventInformation(e){
   setFieldValue('dsgvo_policy',e.dsgvo_policy);
  setFieldValue('script_registration_close_date',e.script_registration_close_date);
 
+  //opens makeAnEvent.html
  openMakeAnEvent();
 }
 
+
+// Function for processing test data from test.html -----------------------------------------------------------------------------------------------------------------------------------
 function postFormDataToSheettest(e){
   
 
@@ -41,6 +39,7 @@ Logger.log(e[key]); //logs value for the property
  
 }
 
+// Function for processing the data from prices.html -----------------------------------------------------------------------------------------------------------------------------------
 function postFormDataToSheetPrices(e){
   // Replace with your spreadsheet's ID.
  var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -73,12 +72,12 @@ for(var key in e) {
   
   
 }
-
+//opens makeAnEvent.html
 openMakeAnEvent();
  
 }
 
-
+// Function for processing the data from questions.html -----------------------------------------------------------------------------------------------------------------------------------
 function postFormDataToSheetQuestions(e){
   // Replace with your spreadsheet's ID.
  var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -108,10 +107,11 @@ for(var key in e) {
   Logger.log(e[key]);
   
 }
-  
+  //opens makeAnEvent.html
   openMakeAnEvent();
 }
 
+// Function for processing the data from scripting_options.html -----------------------------------------------------------------------------------------------------------------------------------
 function postFormDataToSheetScriptingOptions(e){
 
   // Create a 'Responses' sheet if it does not exist.
@@ -127,11 +127,12 @@ function postFormDataToSheetScriptingOptions(e){
   setFieldValue('script_color_on_paid',e.script_color_on_paid);
  
 
- 
+ //opens makeAnEvent.html
 openMakeAnEvent();
  
 }
 
+// Function for processing the data from finance.html -----------------------------------------------------------------------------------------------------------------------------------
 function postFormDataToSheetFinanceOptions(e){
 
   // Create a 'Responses' sheet if it does not exist.
@@ -151,7 +152,7 @@ function postFormDataToSheetFinanceOptions(e){
  setFinanceValue('cash_office_hours', e.cash_office_hours);
  
 
- 
+ // opens home.html
 openHome();
  
 }
