@@ -1,3 +1,5 @@
+
+// Created menu for the event sheet ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   // Or DocumentApp or FormApp.
@@ -24,15 +26,20 @@ function onOpen() {
       .addToUi();
 }
 
+
+// creates html interface based on home.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('home');
 }
+
+// returns a html template from the given file ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function getContent(filename) {
 
 var return1= HtmlService.createTemplateFromFile(filename).getRawContent();
 return return1;
 }
 
+// Opens home.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openHome() {
   
   var html = HtmlService.createTemplateFromFile('home')
@@ -43,6 +50,8 @@ function openHome() {
   
  
 }
+
+// Opens finance.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openFinanceForm() {
   
   var html = HtmlService.createTemplateFromFile('finance')
@@ -54,6 +63,7 @@ function openFinanceForm() {
  
 }
 
+// Opens test.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openTest() {
   
   var html = HtmlService.createTemplateFromFile('test')
@@ -76,6 +86,7 @@ function openEmail() {
  
 }
 
+// Opens eventInformationForm.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openEventInformationForm() {
   
   var html = HtmlService.createTemplateFromFile('eventInformationForm')
@@ -86,6 +97,8 @@ function openEventInformationForm() {
   
  
 }
+
+// Opens prices.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openPricesForm() {
   
   var html = HtmlService.createTemplateFromFile('prices')
@@ -97,6 +110,7 @@ function openPricesForm() {
  
 }
 
+// Opens questions.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openQuestionsForm() {
   
   var html = HtmlService.createTemplateFromFile('questions')
@@ -107,6 +121,8 @@ function openQuestionsForm() {
   
  
 }
+
+// Opens scripting_options.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openScriptingForm() {
   
   var html = HtmlService.createTemplateFromFile('scripting_options')
@@ -118,6 +134,7 @@ function openScriptingForm() {
  
 }
 
+// Opens makeAnEvent.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openMakeAnEvent(){
 var html = HtmlService.createTemplateFromFile('makeAnEvent')
     .evaluate()
@@ -126,6 +143,7 @@ var html = HtmlService.createTemplateFromFile('makeAnEvent')
   SpreadsheetApp.getUi().showModalDialog(html, 'Make an Event');
 }
 
+// Opens multi_payment.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function multi_payment(){
 var html = HtmlService.createTemplateFromFile('multi_payment')
     .evaluate()
@@ -135,6 +153,8 @@ var html = HtmlService.createTemplateFromFile('multi_payment')
   
 
 }
+
+// Opens printlist.html ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function openPrintlist(){
 var html = HtmlService.createTemplateFromFile('printlist')
     .evaluate()
@@ -145,10 +165,14 @@ var html = HtmlService.createTemplateFromFile('printlist')
 
 }
 
+
+// turns a file into an html template and includes it into another html file ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename)
       .getContent();
 }
+
+// returns url of the script ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 function getScriptUrl() {
  var url = ScriptApp.getService().getUrl();
  return url;
