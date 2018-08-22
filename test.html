@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    
+<?!= getContent("Stylesheet")?>
+  </head>
+  <body>
+
+  
+<?!= getContent("navigation")?>
+    <form>
+     
+
+   <br> 
+   dsgvo_policy:<br> 
+    <select name="dsgvo_policy">
+    <? 
+    var policies = getDSGVODropdownOptions();
+    for (i=0; i< policies.length;i++){
+    
+    if(getFieldValue('dsgvo_policy')== policies[i]){
+    ?>
+    <option value="<?=policies[i]?>" selected><?=policies[i]?></option>
+    <?
+    
+    }else{
+    ?>
+     <option value="<?=policies[i]?>" ><?=policies[i]?></option>
+     <?
+    }
+    
+    }
+    ?>
+    </select>
+  
+    
+  <br><br>
+  <input type="submit" class="submit" value="Submit" onclick="google.script.run.postFormDataToSheettest(this.parentNode);">
+    
+    </form>
+  </body>
+</html>
+
+
