@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <p>
+    How to enable multiple payment methods:</p>
+    <ol>
+    <li>Add a question called "Payment Method"</li>
+    <li>Make this question either a dropdown or radiobutton</li>
+    <li>Add the payment options to the question like for example "Office,PayPal"</li>
+    <li>Fill in the financial information for your payment method</li>
+    </ol>
+    <p>How to enable a different email per payment method:</p>
+     <ol>
+    <li>Enable the option "Send registration emails based on payment type" in the scripting options</li>
+    <li>Make an email and give it a subject, in this example let's take "Registration"   </li>
+    <li>Make one copy per payment method you are offering and add "_payment method" to the subject. To continue with our previous example, the respective subjects would
+    now be "Registration_Office" and "Registration_PayPal"</li>
+    <li>Customise the emails to what you'd like the registered person to receive. 
+    <ul>
+    <li>You can use [paypal_link] in your email to generate a payment link for PayPal.</li>
+    <li>You can use [bank_transfer] in your email to display the bank transfer details.</li>
+    <li>You can use [office] in your email to display the address of your office.</li>
+    </ul>
+    </li>
+    <li>Write the subject without the payment method in "Registration email name" in the scripting options, in our example you have to write "Registration" there.</li>
+    <li></li>
+    </ol>
+  </body>
+</html>
+
+
