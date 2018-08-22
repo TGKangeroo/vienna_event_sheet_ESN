@@ -1,3 +1,4 @@
+// Function listing every excel field of the option sheet and its coordinates --------------------------------------------------------------------------------------------------------------------------------
 function fields(name){
 var fields=[];
 //variables for event information (Blue block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -52,31 +53,64 @@ fields['form_id']='B40';
 }
 
 
+// Function listing every excel field of the finance sheet and its coordinates --------------------------------------------------------------------------------------------------------------------------------
+function finances(name){
+var fields=[];
 
+
+fields['paypal_allowed']='B5';
+fields['paypal_email_address']='B6';
+fields['paypal_business_percentage']='B7';
+fields['paypal_description']='B8';
+  
+fields['banktransfer_allowed']='B12';
+fields['banktransfer_account_owner']='B13';
+fields['banktransfer_bank_name']='B14';
+fields['banktransfer_iban']='B15';
+fields['banktransfer_bic']='B16';
+fields['banktransfer_description']='B17';
+  
+fields['cash_allowed']='B21';
+fields['cash_office_address']='B22';
+fields['cash_office_days']='B23';
+fields['cash_office_hours']='B24';  
+  
+return fields[name];
+}
+
+
+// Define dropdown options of which sections are currently available --------------------------------------------------------------------------------------------------------------------------------
 function getSectionDropdownOptions()
 {
   var sections=["UW","BOKU","TU","BFI","WKW","Technikum","Vienna"];
 return sections;
 
 }
+
+// Define dropdown options of the isPaid dropdown list --------------------------------------------------------------------------------------------------------------------------------
 function getPaidDropdownOptions()
 {
   var paid=["yes","no"];
   return paid;
 }
 
+// Define all DSGVO dropdown options --------------------------------------------------------------------------------------------------------------------------------
 function getDSGVODropdownOptions()
 {
   var DSGVOS=["Standard","Custom"];
 return DSGVOS;
 
 }
+
+// Define all cancellation policy dropdown options --------------------------------------------------------------------------------------------------------------------------------
 function getcancellationPolicyDropdownOptions()
 {
   var cancellations=["14","7","0","Custom"];
 return cancellations;
 
 }
+
+// Get the value of a field by fieldname  --------------------------------------------------------------------------------------------------------------------------------
 function getFieldValue(field){
 
   return optionSheet.getRange(fields(field)).getValue();
@@ -85,7 +119,23 @@ function getFieldValue(field){
 
 }
 
+// Set the value of a field by fieldname --------------------------------------------------------------------------------------------------------------------------------
 function setFieldValue(field,value){
 
   return optionSheet.getRange(fields(field)).setValue(value);
+}
+
+// Get the value of a finance field by fieldname  --------------------------------------------------------------------------------------------------------------------------------
+function getFinanceValue(field){
+
+  return financeSheet.getRange(finances(field)).getValue();
+
+
+
+}
+
+// set the value of a finance field by fieldname  --------------------------------------------------------------------------------------------------------------------------------
+function setFinanceValue(field,value){
+
+  return financeSheet.getRange(finances(field)).setValue(value);
 }
