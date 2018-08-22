@@ -157,3 +157,13 @@ return check;
 }
 
 
+function readyForm(){
+  if(checkEverything()){
+  makeForm();
+  }else{
+  
+  showAlert('You did something wrong','Please make sure all boxes appear green before making a form!');
+  }
+
+}
+
