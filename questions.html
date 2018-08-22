@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <style>
+  
+  .question{
+  border:1px solid white;
+  margin:10px;
+  padding:5px;
+  }
+  
+  </style>
+  
+    <base target="_top">
+  <?!= getContent("Stylesheet")?>
+  </head>
+  <body>
+
+  
+<?!= getContent("navigation")?>
+  <? 
+    var questions = getAllQuestions();
+   var questiontypes=['text','email','radiobutton','date','checkbox','dropdown','time','datetime','duration'];
+   
+    ?>
+  
+    <form>
+  <?
+  
+  for(i=0;i<questions.length;i++){
+  
+  ?>
+  <div class="question">
+    <h3>Question <?= i+1 ?>:</h3>
+    Name:<br> 
+    <input type="text" name="question<?= i+1 ?>_name" value="<?= questions[i][0] ?>" />
+    <br> 
+    Type:<br> 
+    <select name="question<?= i+1 ?>_type">
+    
+    <option value=''> </option>
+    <?
+    for (var j = 0; j < questiontypes.length; ++j) {
+    if(questiontypes[j]!=''){
+    if(questions[i][1]== questiontypes[j]){
+    ?>
+    <option value="<?=questiontypes[j]?>" selected><?=questiontypes[j]?></option>
+    <?
+    
+    }else{
+    ?>
+     <option value="<?=questiontypes[j]?>" ><?=questiontypes[j]?></option>
+     <?
+    }
+    
+    }}
+    ?>
+    </select>
+    <br>
+   Options (please devide by a ","):<br> 
+    <input type="text" name="question<?= i+1 ?>_options" value="<?= questions[i][2] ?>" />
+     <br> 
+   Required:<br> 
+    <input type="text" name="question<?= i+1 ?>_required" value="<?= questions[i][3] ?>" />
+    <br>
+    Description:<br> 
+    <input type="text" name="question<?= i+1 ?>_description" value="<?= questions[i][4] ?>" />
+  </div>
+  
+  <?
+  
+  }
+  
+  ?>
+  
+  
+  
+  <br><br>
+  <input type="submit" class="submit" value="Submit" onclick="google.script.run.postFormDataToSheetQuestions(this.parentNode);">
+    
+    </form>
+  </body>
+</html>
+
