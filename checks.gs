@@ -1,6 +1,6 @@
 
 
-
+// checks and logs issues with event fields that could cause a crash of the event scripts -------------------------------------------------------------------------------------------------------------
 function checkEventInformation() {
   var check=true; 
   if(getFieldValue('event_title') ==""){check=false;Logger.log('Fill in the event title');}
@@ -18,7 +18,7 @@ function checkEventInformation() {
  
   return check;
 }
-
+// checks and logs issues with question fields that could cause a crash of the event scripts -------------------------------------------------------------------------------------------------------------
 function checkQuestions(){
 var check=true;
 var checkEmail=false;
@@ -30,7 +30,11 @@ var checkPaymentMethod=false;
   
   
 var questions = getAllQuestions();
+  
+  // array with all current question types
 var questiontypes=['text','email','radiobutton','date','checkbox','dropdown','time','datetime','duration'];
+  
+  // array with all question types that need the option field
 var questionOptionTypes=  ['radiobutton','checkbox','dropdown'];
   
   for(var i=0;i<questions.length;i++){  
@@ -56,6 +60,8 @@ var questionOptionTypes=  ['radiobutton','checkbox','dropdown'];
   return check;
 }
 
+
+// checks and logs issues with price fields that could cause a crash of the event scripts -------------------------------------------------------------------------------------------------------------
 function checkPrices(){
 var check=true;
 var questions = getAllQuestionNames();
@@ -78,7 +84,7 @@ var prices = getAllPrices();
 return check;
 }
 
-
+// checks and logs issues with script fields that could cause a crash of the event scripts -------------------------------------------------------------------------------------------------------------
 function checkScriptingOptions(){
 var check=true;
   
@@ -96,7 +102,7 @@ if(getFieldValue('script_sticky_names') ==""){check=false;Logger.log('Choose if 
 return check;
 }
 
-
+// checks and logs issues with the finance fields that could cause a crash of the event scripts -------------------------------------------------------------------------------------------------------------
 function checkFinances(){
   var check=true;
   if (getFinanceValue('paypal_allowed') == "yes"){
@@ -123,6 +129,7 @@ function checkFinances(){
 return check;
 }
 
+// checks and logs issues with the event script already generating parts of its output before -------------------------------------------------------------------------------------------------------------
 function checkPrerequisits(){
 var check= true;
   
@@ -134,6 +141,7 @@ var check= true;
 return check;
 }
 
+// Executes all the previous checks -------------------------------------------------------------------------------------------------------------
 function checkEverything(){
 var check = true;
   
