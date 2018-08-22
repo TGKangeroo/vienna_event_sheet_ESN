@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    
+<?!= getContent("Stylesheet")?>
+  </head>
+  <body>
+
+  
+<?!= getContent("navigation")?>
+    <form>
+     
+  
+    
+     Event title:<br> 
+    <input type="text" name="event_title" value="<?= getFieldValue('event_title') ?>" />
+   <br> 
+    event_description:<br> 
+    <input type="text" name="event_description" value="<?= getFieldValue('event_description') ?>" />
+   <br> 
+    event_start_date:<br> 
+    <input type="date" name="event_start_date" value="<?= Utilities.formatDate(new Date(getFieldValue('event_start_date')), "Europe/Vienna", "YYYY-MM-dd") ?>" />
+   <br> 
+    event_start_time:<br> 
+    <input type="text" name="event_start_time" value="<?= Utilities.formatDate(new Date(getFieldValue('event_start_time')), "Europe/Vienna", "HH:mm") ?>" />
+   <br> 
+    event_end_date:<br> 
+    <input type="date" name="event_end_date" value="<?= Utilities.formatDate(new Date(getFieldValue('event_end_date')), "Europe/Vienna", "YYYY-MM-dd") ?>" />
+   <br> 
+    event_end_time:<br> 
+    <input type="text" name="event_end_time" value="<?= Utilities.formatDate(new Date(getFieldValue('event_end_time')), "Europe/Vienna", "HH:mm") ?>" />
+   <br> 
+    event_meetingpoint:<br> 
+    <input type="text" name="event_meetingpoint" value="<?= getFieldValue('event_meetingpoint') ?>" />
+   <br> 
+    event_max_participants:<br> 
+    <input type="text" name="event_max_participants" value="<?= getFieldValue('event_max_participants') ?>" />
+   <br> 
+    event_isPaid:<br> 
+    <select name="event_isPaid">
+    <? 
+    var paid = getPaidDropdownOptions();
+    for (i=0; i< paid.length;i++){
+    
+    if(getFieldValue('event_isPaid')== paid[i]){
+    ?>
+    <option value="<?=paid[i]?>" selected><?=paid[i]?></option>
+    <?
+    
+    }else{
+    ?>
+     <option value="<?=paid[i]?>" ><?=paid[i]?></option>
+     <?
+    }
+    
+    }
+    ?>
+    </select>
+   
+   <br> 
+    event_section:<br> 
+    <select name="event_section">
+    <? 
+    var sections = getSectionDropdownOptions();
+    for (i=0; i< sections.length;i++){
+    
+    if(getFieldValue('event_section')== sections[i]){
+    ?>
+    <option value="<?=sections[i]?>" selected><?=sections[i]?></option>
+    <?
+    
+    }else{
+    ?>
+     <option value="<?=sections[i]?>" ><?=sections[i]?></option>
+     <?
+    }
+    
+    }
+    ?>
+    </select>
+    
+   <br> 
+   Cancellation Policy:<br> 
+   <select name="cancellation_policy">
+    <? 
+    var cancellations = getcancellationPolicyDropdownOptions();
+    for (i=0; i< cancellations.length;i++){
+    
+    if(getFieldValue('cancellation_policy')== cancellations[i]){
+    ?>
+    <option value="<?=cancellations[i]?>" selected><?=cancellations[i]?></option>
+    <?
+    
+    }else{
+    ?>
+     <option value="<?=cancellations[i]?>" ><?=cancellations[i]?></option>
+     <?
+    }
+    
+    }
+    ?>
+    </select>
+   <br> 
+   dsgvo_policy:<br> 
+    <select name="dsgvo_policy">
+    <? 
+    var policies = getDSGVODropdownOptions();
+    for (i=0; i< policies.length;i++){
+    
+    if(getFieldValue('dsgvo_policy')== policies[i]){
+    ?>
+    <option value="<?=policies[i]?>" selected><?=policies[i]?></option>
+    <?
+    
+    }else{
+    ?>
+     <option value="<?=policies[i]?>" ><?=policies[i]?></option>
+     <?
+    }
+    
+    }
+    ?>
+    </select>
+   <br> 
+    Registration closing date:<br> 
+    <input type="date" name="script_registration_close_date" value="<?= Utilities.formatDate(new Date(getFieldValue('script_registration_close_date')), "Europe/Vienna", "YYYY-MM-dd") ?>" />
+   <br> 
+    
+  <br><br>
+  <input type="submit" class="submit" value="Submit" onclick="google.script.run.postFormDataToSheetEventInformation(this.parentNode);">
+    
+    </form>
+  </body>
+</html>
+
+
