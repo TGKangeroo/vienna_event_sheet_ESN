@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+  
+  <h3> Event details </h3>
+  <ul>
+    <li>[event_title] = <?= getFieldValue('event_title') ?> </li>
+    <li>[event_description] = <?= getFieldValue('event_description') ?> </li>
+    <li>[event_start_date] = <?= getFieldValue('event_start_date') ?> </li>
+    <li>[event_start_time] = <?= getFieldValue('event_start_time') ?></li>
+    <li>[event_end_date] = <?= getFieldValue('event_end_date') ?> </li>
+    <li>[event_end_time] = <?= getFieldValue('event_end_time') ?> </li>
+    <li>[event_meetingpoint] = <?= getFieldValue('event_meetingpoint') ?> </li>
+    <li>[event_max_participants] = <?= getFieldValue('event_max_participants') ?></li>
+    <li>[event_max_participants] = <?= getFieldValue('event_max_participants') ?></li>
+    <li>[event_section] = <?= getSection() ?></li>
+    </ul>
+    <h3> Payment options </h3>
+    <ul>
+    <li>[paypal_link] = custom paypal link </li>
+    <li>[bank_transfer] = lists all bank transfer details</li>
+    <li>[price] = calculates the price for a participant</li>
+    <li>[finance_bank_description] = shows the description to add to a bank transfer</li>
+    </ul>
+    <h3> User input </h3>
+    <ul>  
+    
+    
+  
+    <? 
+    var script_form_fields_amount = getFieldValue('script_form_fields_amount');
+  var questionRange =optionSheet.getRange(4, 10, script_form_fields_amount, 1);
+  var questionvalues = questionRange.getValues();
+  var questionsHTML= "";
+  
+    for(var j = 0; j <questionvalues.length; j++){
+
+    ?>
+    
+    <li> [ <?= questionvalues[j] ?> ] = answer of user on this question </li>
+    
+    <?
+  }
+  
+  
+  ?>
+  
+  </ul>
+  </body>
+</html>
+
+
