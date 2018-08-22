@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+   
+  <?!= getContent("Stylesheet")?>
+  </head>
+  <body>
+
+  
+<?!= getContent("navigation")?>
+<div class="container">
+  <div class="center-buttons">
+<button class='button' onclick="google.script.run.openEventInformationForm()" <? if(checkEventInformation() == true){?>id='green' <?}else{?>id='red'<?}?>>Event Information </button>
+<button class='button' onclick="google.script.run.openPricesForm()" <? if(checkPrices() == true){?>id="green" <?}else{?>id="red"<?}?>>Prices </button>
+<button class='button' onclick="google.script.run.openQuestionsForm()" <? if(checkQuestions() == true){?>id="green" <?}else{?>id="red"<?}?>>Questions </button>
+<button class='button' onclick="google.script.run.openScriptingForm()" <? if(checkScriptingOptions() == true){?>id="green" <?}else{?>id="red"<?}?>>Scripting </button>
+<button class='button' onclick="google.script.run.openFinanceForm()" <? if(checkFinances() == true){?>id="green" <?}else{?>id="red"<?}?>>Finance</button>
+<button class='button' onclick="google.script.run.removeForm()" <? if(checkPrerequisits() == true){?>id="green" <?}else{?>id="red"<?}?>>Form</button>
+</div>
+
+<div class="center-text">
+
+<?!= Logger.getLog() ?>
+</div>
+
+<div class="bottom-buttons">
+<button class='button' onclick="google.script.run.openQuestionsForm()" <? if(checkEverything() == true){?>id="green" <?}else{?>id="red"<?}?>>Create Event </button>
+</div>
+</div>
+</body>
+</html>
+
+
