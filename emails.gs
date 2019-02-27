@@ -648,3 +648,50 @@ function replaceTerms(message,i){
   return message;
 
 }
+
+/**
+* creates the draft mails according to the names in the fields 
+*/
+function createDraftMails() {
+  var script_confirm_mail_name= getFieldValue('script_confirm_mail_name');
+  var script_registration_mail_name = getFieldValue('script_registration_mail_name');
+  var script_extra_mail_name = getFieldValue('script_extra_mail_name');
+  
+  var script_form_fields_amount= getFieldValue('script_form_fields_amount');
+ 
+  var range = optionSheet.getRange(4,10,30,3).getValues(); //get range J4:L34
+
+  console.log(range);
+  var payment_methods = [];
+  for(var i = 0 ; i< range.length ; i++) {
+    if(range[i][0]  == "Payment method") {
+        payment_methods = range[i][2].split(',');
+    }
+  }
+  console.log(payment_methods);
+
+  var drafts = GmailApp.getDraftMessages();
+
+  if(!existsDraft(script_confirm_mail_name,drafts)) {
+    GmailApp.createDraft("", script_confirm_mail_name, "Confirm email ");
+  }
+  if(!existsDraft(script_extra_mail_name,drafts)) {
+    GmailApp.createDraft("", script_extra_mail_name, "Extra email ");
+  }
+
+  for each (var payment in  payment_methods) {
+    var subject = script_registration_mail_name + "_" + payment;
+    if(!existsDraft(subject,drafts)) {
+      GmailApp.createDraft("", subject, "Fill Payment info " + payment);  
+    }
+  }
+}
+
+function existsDraft(subject, drafts) {
+  for each(var draft in drafts) {
+    if(draft.getSubject() == subject) {
+      return true;
+    }
+  }
+  return false;
+}
