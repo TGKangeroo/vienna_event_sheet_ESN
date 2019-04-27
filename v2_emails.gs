@@ -2,41 +2,17 @@
 var CONFIRM_MAIL = "confirm sent";
 var REGISTER_MAIL = "register sent";
 var EXTRA_MAIL = "extra sent";
-function sendEmail(row, type) {
-    var script_confirm_mail_name = getFieldValue('script_confirm_mail_name');
-    var script_registration_mail_name = getFieldValue('script_registration_mail_name');
-    var data = registerSheet.getRange(row, script_form_fields_amount + 6, 1, 1).getValues();
-    var emailSent = data[0];
-    var Email = getByName("Email", row - 1);
-    if (Email != '') {
-        switch (type) {
-            case 'confirmation':
-                if (script_confirm_mail_name != "" && emailSent != CONFIRM_MAIL && getByName("Paid", row - 1) == "yes") {
-                    if (sendGmailTemplate(Email, row, type))
-                        registerSheet.getRange(row, script_form_fields_amount + 6).setValue(CONFIRM_MAIL);
-                }
-                break;
-            case 'registration':
-                if (script_registration_mail_name != "" && emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL) {
-                    if (sendGmailTemplate(Email, row, type))
-                        registerSheet.getRange(row, script_form_fields_amount + 6).setValue(REGISTER_MAIL);
-                }
-                break;
-        }
-    }
-    // Make sure the cell is updated right away in case the script is interrupted
-    SpreadsheetApp.flush();
-}
+
 //sends confirmation email to the participant in row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendconfirmationEmail(row) {
     if (options["AUTO_CONF_MAIL"]) {
         var scriptRange = row.getCell(1, indexOfScript);
-        var emailSent = scriptRange.getValues()[0]; 
+        var emailSent = scriptRange.getValues()[0];
         var email = getByNameRow("Email", row);
         if (emailSent != CONFIRM_MAIL && email != "" && getByNameRow("Paid", row) == "yes") {  // Prevents sending duplicates
             var subject = "Confirmation " + options["EVENT_TITLE"];
             //if the user has a whole confirm draft
-            if (sendGmailConfirmTemplate(email, subject, row)) {
+            if (sendGmailTemplate(email, subject, row, {}, options["CONF_MAIL_NAME"])) {
                 scriptRange.setValue(CONFIRM_MAIL);
             }
             // Make sure the cell is updated right away in case the script is interrupted
@@ -52,14 +28,15 @@ function sendRegisterEmail(row) {
         var scriptRange = row.getCell(1, indexOfScript);
         var email = getByNameRow("Email", row);
         var emailSent = scriptRange.getValues()[0];     // column where we can check if the user already got an email
-        Logger.log("emailSent " + emailSent);
-        Logger.log("row " + row);
-        Logger.log("Email " + email);
         if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && email != "") {  // Prevents sending duplicates
             var subject = "Registration " + options["EVENT_TITLE"];
             //if the user has a whole confirm draft
             if (script_registration_mail_name != "") {
-                if (sendGmailRegisterTemplate(email, subject, row)) {
+                if (options["REG_MAIL_PAYMENTTYPE"]) {
+                    var paymentmethod = getByNameRow("Payment method", row);
+                    script_registration_mail_name = script_registration_mail_name + "_" + paymentmethod;
+                }
+                if (sendGmailTemplate(email, subject, row, {}, script_registration_mail_name)) {
                     scriptRange.setValue(REGISTER_MAIL);
                 } else {
                     Logger.log("error while sending mail");
@@ -70,73 +47,31 @@ function sendRegisterEmail(row) {
         }
     }
 }
-//Merge of looped email functions --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function Email() {
-    var script_confirm_mail_name = getFieldValue('script_confirm_mail_name');
-    var script_auto_confirm_mails = getFieldValue('script_auto_confirm_mails');
-    var script_registration_mail_name = getFieldValue('script_registration_mail_name');
-    var script_auto_registration_mails = getFieldValue('script_auto_registration_mails');
-    var script_form_fields_amount = getFieldValue('script_form_fields_amount');
-    var script_extra_mail_name = getFieldValue('script_extra_mail_name');
-    var script_extra_mail_on_pay = getFieldValue('script_extra_mail_on_pay');
-    //redefine the datarange to the registerSheet values
-    var dataRange = registerSheet.getRange(2, 1, registerSheet.getLastRow() - 1, script_form_fields_amount + 7); // let it read more columns than are being used, it might mess up otherwise
-    // Fetch values for each row in the Range.
-    var data = dataRange.getValues();
-    var type = '';
-    for (var i = 0; i < data.length; ++i) {
-        var row = data[i];
-        var emailSent = row[script_form_fields_amount + 5];
-        var Email = getByName("Email", i + 1);
-        if (emailSent != CONFIRM_MAIL && Email != "" && getByName("Paid", i + 1) == "yes" && script_confirm_mail_name != "") {
-            type = 'confirmation';
-            if (sendGmailTemplate(Email, i + 2, type))
-                registerSheet.getRange(2 + i, script_form_fields_amount + 6).setValue(CONFIRM_MAIL);
-        }
-        if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && Email != "" && script_registration_mail_name != "") {
-            type = 'registration';
-            if (sendGmailTemplate(Email, i + 2, type))
-                registerSheet.getRange(2 + i, script_form_fields_amount + 6).setValue(REGISTER_MAIL);
-        }
-        emailSent = row[script_form_fields_amount + 6];
-        if (emailSent != EXTRA_MAIL && Email != "" && script_extra_mail_name != "") {
-            type = 'extra';
-            if (script_extra_mail_on_pay == "yes") {
-                if (getByName("Paid", i + 1) == "yes") {
-                    if (sendGmailExtraTemplate(Email, i + 2, type))
-                        registerSheet.getRange(2 + i, script_form_fields_amount + 7).setValue(EXTRA_MAIL);
+//sends an email to all participants when clicking extra email button --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function sendExtraEmails() {
+    var script_extra_mail_name = options["EXTRA_MAIL_NAME"];
+    if (script_extra_mail_name == "") {
+        showAlert("no extra mail name","specify extra mail name in options sheet");
+        return;
+    }
+
+    for (var i = 2; i <= registerSheet.getLastRow(); ++i) {
+        var row = registerSheet.getRange(i, 1, registerSheet.getLastRow(), registerHeaders.length); // let it read more 
+
+        var emailSent = row.getCell(1, indexOfScript);
+        var email = row.getCell(1, getColumnId("Email")).getValue();
+        if (emailSent.getValue() != EXTRA_MAIL && email != "") {  // Prevents sending duplicates
+            var subject = options["EVENT_TITLE"];
+
+            if (options["EXTRA_PAID"]) {
+                if (row.getCell(1, indexOfPaid).getValue() == "yes") {
+                    if (sendGmailTemplate(email, subject, row, {}, options["EXTRA_MAIL_NAME"])) {
+                        emailSent.setValue(EXTRA_MAIL);
+                    }
                 }
             } else {
-                if (sendGmailExtraTemplate(Email, i + 2, type))
-                    registerSheet.getRange(2 + i, script_form_fields_amount + 7).setValue(EXTRA_MAIL);
-            }
-        }
-    }
-    SpreadsheetApp.flush();
-}
-//sends an email to all participants when clicking extra email button --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function sendExtraEmail() {
-    var script_form_fields_amount = getFieldValue('script_form_fields_amount');
-    var script_extra_mail_name = getFieldValue('script_extra_mail_name');
-    var script_extra_mail_on_pay = getFieldValue('script_extra_mail_on_pay');
-    var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() - 1, script_form_fields_amount + 8); // let it read more columns than are being used, it might mess up otherwise
-    // Fetch values for each row in the Range.
-    var data = dataRange.getValues();
-    for (var i = 1; i < data.length; ++i) {
-        row = data[i];
-        var emailSent = row[script_form_fields_amount + 7];     // Third column
-        if (emailSent != EXTRA_MAIL && getByName("Email", i) != "") {  // Prevents sending duplicates
-            var subject = event_title;
-            if (script_extra_mail_name != "") {
-                if (script_extra_mail_on_pay == "yes") {
-                    if (getByName("Paid", i) == "yes") {
-                        if (sendGmailExtraTemplate(getByName("Email", i), subject, i)) {
-                            registerSheet.getRange(1 + i, script_form_fields_amount + 8).setValue(EXTRA_MAIL);
-                        }
-                    }
-                } else {
-                    if (sendGmailExtraTemplate(getByName("Email", i), subject, i))
-                        registerSheet.getRange(1 + i, script_form_fields_amount + 8).setValue(EXTRA_MAIL);
+                if (sendGmailTemplate(email, subject, row, {}, options["EXTRA_MAIL_NAME"])) {
+                    emailSent.setValue(EXTRA_MAIL);
                 }
             }
             // Make sure the cell is updated right away in case the script is interrupted
@@ -144,180 +79,21 @@ function sendExtraEmail() {
         }
     }
 }
-//loops over all participants, sends registration email if not sent yet --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function registerEmail() {
-    var script_registration_mail_name = getFieldValue('script_registration_mail_name');
-    var script_auto_registration_mails = getFieldValue('script_auto_registration_mails');
-    var script_form_fields_amount = getFieldValue('script_form_fields_amount');
-    if (script_auto_registration_mails == "yes") {
-        var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() - 1, script_form_fields_amount + 8); // let it read more columns than are being used, it might mess up otherwise
-        // Fetch values for each row in the Range.
-        var data = dataRange.getValues();
-        for (var i = 1; i < data.length; ++i) {
-            var row = data[i];
-            var emailSent = row[script_form_fields_amount + 6];     // Third column
-            if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && getByName("Email", i) != "") {  // Prevents sending duplicates
-                var subject = "Registration " + getFieldValue('event_title');
-                if (script_registration_mail_name != "") {
-                    if (sendGmailRegisterTemplate(getByName("Email", i), subject, i))
-                        registerSheet.getRange(1 + i, script_form_fields_amount + 7).setValue(REGISTER_MAIL);
-                }
-                // Make sure the cell is updated right away in case the script is interrupted
-                SpreadsheetApp.flush();
-            }
-        }
-    }
-}
-//loops over all participants, sends confirmation email if paid and if not sent yet --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function confirmationEmail() {
-    var script_confirm_mail_name = getFieldValue('script_confirm_mail_name');
-    var script_auto_confirm_mails = getFieldValue('script_auto_confirm_mails');
-    var script_form_fields_amount = getFieldValue('script_form_fields_amount');
-    if (script_auto_confirm_mails == "yes") {
-        //redefine the datarange to the registerSheet values
-        var dataRange = registerSheet.getRange(1, 1, registerSheet.getLastRow() - 1, script_form_fields_amount + 8); // let it read more columns than are being used, it might mess up otherwise
-        // Fetch values for each row in the Range.
-        var data = dataRange.getValues();
-        for (var i = 1; i < data.length; ++i) {
-            var row = data[i];
-            var emailSent = row[script_form_fields_amount + 6];     // column where we can check if the user already got an email
-            if (emailSent != CONFIRM_MAIL && getByName("Email", i) != "" && getByName("Paid", i) == "yes") {  // Prevents sending duplicates
-                var subject = "Confirmation " + getFieldValue('event_title');
-                //if the user has a whole confirm draft
-                if (script_confirm_mail_name != "") {
-                    if (sendGmailConfirmTemplate(getByName("Email", i), subject, i))
-                        registerSheet.getRange(1 + i, script_form_fields_amount + 7).setValue(CONFIRM_MAIL);
-                }
-                // Make sure the cell is updated right away in case the script is interrupted
-                SpreadsheetApp.flush();
-            }
-        }
-    }
-}
-//merge of sendconfirmGmailTemplate, sendRegisterGmailTemplate, sendExtraGmailTemplate --------------------------------------------------------------------------------------------------------------------------------------------------------//
-/**
-* Insert the given email body text into an email template, and send
-* it to the indicated recipient. The template is a draft message with
-* the subject "TEMPLATE"; if the template message is not found, an
-* exception will be thrown. The template must contain text indicating
-* where email content should be placed: {BODY}.
-*
-* @param {String} recipient  Email address to send message to.
-* @param {String} subject    Subject line for email.
-* @param {String} body       Email content, may be plain text or HTML.
-* @param {Object} options    (optional) Options as supported by GmailApp.
-*
-* @returns        GmailApp   the Gmail service, useful for chaining
-*/
-function sendGmailTemplate(recipient, i, type, options) {
-    var script_confirm_mail_name = getFieldValue('script_confirm_mail_name');
-    var script_auto_confirm_mails = getFieldValue('script_auto_confirm_mails');
-    var script_registration_mail_name = getFieldValue('script_registration_mail_name');
-    var script_auto_registration_mails = getFieldValue('script_auto_registration_mails');
-    var script_form_fields_amount = getFieldValue('script_form_fields_amount');
-    var script_extra_mail_name = getFieldValue('script_extra_mail_name');
-    var script_extra_mail_on_pay = getFieldValue('script_extra_mail_on_pay');
-    options = options || {};  // default is no options
-    var draftsubject = '';
-    var drafts = GmailApp.getDraftMessages();
-    var found = false;
-    var subject;
-    //Choose which email template to use based on the type of email you're sending
-    switch (type) {
-        case 'confirmation':
-            draftsubject = script_confirm_mail_name;
-            subject = 'Confirmation ' + getFieldValue('event_title');
-            break;
-        case 'registration':
-            draftsubject = script_registration_mail_name;
-            subject = 'Registration ' + getFieldValue('event_title');
-            if (script_register_on_pay == "yes") {
-                var paymentmethod = getByName("Payment method", i);
-                draftsubject = draftsubject + "_" + paymentmethod;
-            }
-            break;
-        case 'extra':
-            draftsubject = script_extra_mail_name;
-            subject = event_title;
-            break;
-    }
-    for (var y = 0; y < drafts.length && !found; y++) {
-        if (drafts[y].getSubject() == draftsubject) {
-            found = true;
-            var template = drafts[y];
-        }
-    }
-    if (!found) throw new Error("TEMPLATE not found in drafts folder");
-    // Generate htmlBody from template, with provided text body
-    var imgUpdates = updateInlineImages(template);
-    var message = imgUpdates.templateBody;
-    message = replaceTerms(message, i);
-    options.htmlBody = message;
-    options.attachments = imgUpdates.attachments;
-    options.inlineImages = imgUpdates.inlineImages;
-    var body = message;
-    return GmailApp.sendEmail(recipient, subject, body, options);
-}
-//constructs registration email and sends it --------------------------------------------------------------------------------------------------------------------------------------------------------//
-/**
-* Insert the given email body text into an email template, and send
-* it to the indicated recipient. The template is a draft message with
-* the subject "TEMPLATE"; if the template message is not found, an
-* exception will be thrown. The template must contain text indicating
-* where email content should be placed: {BODY}.
-*
-* @param {String} recipient  Email address to send message to.
-* @param {String} subject    Subject line for email.
-* @param {String} body       Email content, may be plain text or HTML.
-* @param {Object} options    (optional) Options as supported by GmailApp.
-*
-* @returns        GmailApp   the Gmail service, useful for chaining
-*/
-function sendGmailRegisterTemplate(recipient, subject, row, mail_options) {
-    var draftsubject = options["REG_MAIL_NAME"];
-    if (options["REG_MAIL_PAYMENTTYPE"]) {
-        var paymentmethod = getByNameRow("Payment method", row);
-        draftsubject = draftsubject + "_" + paymentmethod;
-    }
-    return sendGmailTemplate(recipient, subject, row, mail_options, draftsubject);
-}
-//constructs extra email template and sends it --------------------------------------------------------------------------------------------------------------------------------------------------------//
-/**
-* Insert the given email body text into an email template, and send
-* it to the indicated recipient. The template is a draft message with
-* the subject "TEMPLATE"; if the template message is not found, an
-* exception will be thrown. The template must contain text indicating
-* where email content should be placed: {BODY}.
-*
-* @param {String} recipient  Email address to send message to.
-* @param {String} subject    Subject line for email.
-* @param {String} body       Email content, may be plain text or HTML.
-* @param {Object} options    (optional) Options as supported by GmailApp.
-*
-* @returns        GmailApp   the Gmail service, useful for chaining
-*/
-function sendGmailExtraTemplate(recipient, subject, i, options) {
-    return sendGmailTemplate(recipient, subject, i, mail_options, options["EXTRA_MAIL_NAME"]);
-}
-//constructs confirmation email template and sends it --------------------------------------------------------------------------------------------------------------------------------------------------------//
-/**
-* Insert the given email body text into an email template, and send
-* it to the indicated recipient. The template is a draft message with
-* the subject "TEMPLATE"; if the template message is not found, an
-* exception will be thrown. The template must contain text indicating
-* where email content should be placed: {BODY}.
-*
-* @param {String} recipient  Email address to send message to.
-* @param {String} subject    Subject line for email.
-* @param {String} body       Email content, may be plain text or HTML.
-* @param {Object} options    (optional) Options as supported by GmailApp.
-*
-* @returns        GmailApp   the Gmail service, useful for chaining
-*/
-function sendGmailConfirmTemplate(recipient, subject, row, mail_options) {
-    return sendGmailTemplate(recipient, subject, row, mail_options, options["CONF_MAIL_NAME"]);
-}
 
+/**
+* Insert the given email body text into an email template, and send
+* it to the indicated recipient. The template is a draft message with
+* the subject "TEMPLATE"; if the template message is not found, an
+* exception will be thrown. The template must contain text indicating
+* where email content should be placed: {BODY}.
+*
+* @param {String} recipient  Email address to send message to.
+* @param {String} subject    Subject line for email.
+* @param {String} body       Email content, may be plain text or HTML.
+* @param {Object} options    (optional) Options as supported by GmailApp.
+*
+* @returns        GmailApp   the Gmail service, useful for chaining
+*/
 function sendGmailTemplate(recipient, subject, row, mail_options, draftsubject) {
     mail_options = mail_options || {};  // default is no options
 
@@ -472,10 +248,4 @@ function sendMail(email_to, subject, html_body) {
         subject: subject,
         htmlBody: html_body
     });
-}
-
-// test code
-
-function testMailSend() {
-    sendMail("bernhard@buddynetwork.at", "testsubject", readDraft("Generic_Confirmation"));
 }

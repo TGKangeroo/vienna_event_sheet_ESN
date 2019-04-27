@@ -166,6 +166,7 @@ function updateTotalParticipants() {
 //test function for development --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function showAlert(title,msg) {
     Logger.log(title + msg );
-    SpreadsheetApp.getUi().alert(title,msg,"yes");
+    var ui = SpreadsheetApp.getUi();
+    ui.alert(title, msg, ui.ButtonSet.OK);
 }
 
