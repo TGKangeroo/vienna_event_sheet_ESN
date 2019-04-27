@@ -37,6 +37,8 @@ function makeForm() {
     if (isFormCreated()) {
         Logger.log("form already created")
         return;
+    } else {
+        Logger.log("creating form");
     }
 
     form = FormApp.create(options["EVENT_TITLE"])
@@ -74,7 +76,8 @@ function makeForm() {
     form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
     
     renameResponsesSheet();
-    //makeTriggers();
+    resetTriggers();
+    
     //Sheet and form sharing permissions 
     // var thisSheet = DriveApp.getFileById(ss.getId());
     // thisSheet.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT)
@@ -85,12 +88,9 @@ function makeForm() {
     optionSheet.getRange("G14").setValue(form.getPublishedUrl());
     optionSheet.getRange("G15").setValue(form.getEditUrl());
     optionSheet.getRange("G16").setValue(ss.getUrl());
-    //make it refresh
-    //optionSheet.getRange('B17').setValue("yes");
-    //optionSheet.getRange('B38').setValue(form.getId());
-    //optionSheet.getRange('A38').setValue("Form ID");
-    //makePrintList();
     SpreadsheetApp.flush();
+
+    createDraftMails();
 
 }
 function replaceConfVars(string) {

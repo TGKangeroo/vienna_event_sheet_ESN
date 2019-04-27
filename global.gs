@@ -3,25 +3,21 @@ var ss = SpreadsheetApp.getActiveSpreadsheet();
 var optionSheet = ss.getSheetByName("Options");
 var priceSheet = ss.getSheetByName("Prices");
 var printSheet = ss.getSheetByName("Print list");
-var financeSheet = ss.getSheetByName("Finances");
 var budgetSheet = ss.getSheetByName("Budget");
 var registerSheet = ss.getSheetByName("Registrations");
-//variables for the event price (yellow block in optionsheet) --------------------------------------------------------------------------------------------------------------------------------------------------------//
+var registerHeaders = registerSheet.getDataRange().getValues()[0];
+
+var drafts = GmailApp.getDraftMessages();
 var prices = getAllPrices();
+
 //returns array of all prices written in the yellow optionsheet block --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function getAllPrices() {
     return priceSheet.getRange("A3:E19").getValues();
 }
-//returns array of all questions written in the pink optionsheet block --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function getAllQuestions() {
-    var dataRange = optionSheet.getRange(4, 10, 35, 5);
-    var data = dataRange.getValues();
-    return data;
-}
 //adds the price a participant has to pay to the registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function totalPriceToBePaid(row) {
-    var price = calculatePrice(row)
-    registerSheet.getRange(row + 1, indexOfTotal ).setValue(price); 
+    var price = calculatePrice(row);
+    row.getCell(1, indexOfTotal).setValue(price); 
 }
 //Add last edited and paid columns to registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makePayAndEditedRow() {
@@ -34,24 +30,38 @@ function makePayAndEditedRow() {
 
     SpreadsheetApp.flush();
 
-    indexOfPaid = indexOfHeader("Paid");
-    indexOfTotal = ndexOfHeader("to be paid");
-    indexOfScript = indexOfHeader("Script");
+    indexOfPaid = getColumnId("Paid");
+    indexOfTotal = getColumnId("to be paid");
+    indexOfScript = getColumnId("Script");
 }
 //retrieves the number of a column based on the column name --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function getColumnId(colName) {
-    var data = registerSheet.getDataRange().getValues();
-    var col = data[0].indexOf(colName);
+    var col = registerHeaders.indexOf(colName);
     if (col != -1) {
         return col + 1;
     } else {
         return -1;
     }
 }
+
+var indexOfPaid = getColumnId("Paid");
+var indexOfTotal = getColumnId("to be paid");
+var indexOfScript = getColumnId("Script");
+
+
+
 //searches a registration value based on column name and row --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function getByName(colName, row) {
+function getByNameRow(colName,row) {
+    var colId = getColumnId(colName);
+    if(colId < 0) {
+        Logger.log("could not find colId for "+ colName);
+        return "not found:"+colName;
+    }
+    return row.getCell(1, colId).getValues()[0];
+}
+function getByName(colName, rowId) {
     var data = registerSheet.getDataRange().getValues();
-    return getByNameData(data, colName, row);
+    return getByNameData(data, colName, rowId);
 }
 function getByNameData(data, colName, row) {
     var col = data[0].indexOf(colName);
@@ -76,14 +86,13 @@ function updatePrices() {
     }
     var dataRange = registerSheet.getRange(2, 1, registerSheet.getLastRow() - 1, registerSheet.getLastColumn()); // let it read more columns than are being used, it might mess up otherwise
     var registrations = dataRange.getValues();
-    var header = registerSheet.getDataRange().getValues()[0];
     // Fetch values for each row in the Range.
     var paid = getColumnId("Paid")-1; //array idx
 
     for (var i = 0; i < registrations.length; ++i) {
         if (registrations[i][paid] == "yes") {
             for (var y = 0; y < prices.length; y++) {
-                var index = header.indexOf(prices[y][idxField]);
+                var index = registerHeaders.indexOf(prices[y][idxField]);
                 if (registrations[i][index] == prices[y][idxValue]) {
                     prices[y][idxAmount] = prices[y][idxAmount] + 1;
                 }
@@ -93,7 +102,7 @@ function updatePrices() {
     dataRange = priceSheet.getRange("A3:E19");
     data = dataRange.getValues();
     for (i = 0; i < data.length; i++) {
-        if (prices[i] != null) {
+        if (prices[i] != null && prices[i][idxAmount] != 0) {
             priceSheet.getRange(i + 3, idxAmount+1).setValue(prices[i][idxAmount]);
             SpreadsheetApp.flush();
         }
@@ -101,24 +110,24 @@ function updatePrices() {
 }
 //Calculate the price per participant --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function calculatePrice(row) {
+    Logger.log("calcprices");
     var prices = getAllPrices();
     var pay = 0;
     for (var i = 0; i < prices.length; i++) {
-        if (!(isNaN(prices[i][1]))) {
+        if (!(isNaN(prices[i][1])) && prices[i][1] != "") {
             if (prices[i][3] == "Base Price") {
                 pay = pay + prices[i][1];
             } else {
-                if (getByName(prices[i][3], row) == prices[i][4]) {
+                if (getByNameRow(prices[i][3], row) == prices[i][4]) {
                     pay = pay + prices[i][1];
                 }
             }
         }
     }
+    Logger.log("calcprices end");
     return pay;
 }
-function testCalculatePrice() {
-    Logger.log(calculatePrice(3));
-}
+
 //check if the registration end date equals to todays date --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function checkEndDate() {
     var enddate = getFieldValue('script_registration_close_date');
@@ -160,17 +169,3 @@ function showAlert(title,msg) {
     SpreadsheetApp.getUi().alert(title,msg,"yes");
 }
 
-//index of the column named Paid
-function indexOfHeader(header) {
-    var headers = registerSheet.getRange("A1:AA1").getValues()[0];
-    for(var i = 0 ; i < headers.length ; i++) {
-        if(headers[i] == header) return i+1; //correct index for getRange
-    }
-    return -1;
-}
-
-var indexOfPaid = indexOfHeader("Paid");
-var indexOfTotal = indexOfHeader("to be paid");
-var indexOfScript = indexOfHeader("Script");
-
-var drafts = GmailApp.getDraftMessages();

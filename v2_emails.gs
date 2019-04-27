@@ -29,15 +29,15 @@ function sendEmail(row, type) {
 }
 //sends confirmation email to the participant in row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendconfirmationEmail(row) {
-    var script_form_fields_amount = getFieldValue('script_form_fields_amount');
     if (options["AUTO_CONF_MAIL"]) {
-        var data = registerSheet.getRange(row + 1, indexOfScript, 1, 1).getValues();
-        var emailSent = data[0];
-        if (emailSent != CONFIRM_MAIL && getByName("Email", row) != "" && getByName("Paid", row) == "yes") {  // Prevents sending duplicates
+        var scriptRange = row.getCell(1, indexOfScript);
+        var emailSent = scriptRange.getValues()[0]; 
+        var email = getByNameRow("Email", row);
+        if (emailSent != CONFIRM_MAIL && email != "" && getByNameRow("Paid", row) == "yes") {  // Prevents sending duplicates
             var subject = "Confirmation " + options["EVENT_TITLE"];
             //if the user has a whole confirm draft
-            if (sendGmailConfirmTemplate(getByName("Email", row), subject, row)) {
-                registerSheet.getRange(row + 1, indexOfScript ).setValue(CONFIRM_MAIL);
+            if (sendGmailConfirmTemplate(email, subject, row)) {
+                scriptRange.setValue(CONFIRM_MAIL);
             }
             // Make sure the cell is updated right away in case the script is interrupted
             SpreadsheetApp.flush();
@@ -48,16 +48,18 @@ function sendconfirmationEmail(row) {
 function sendRegisterEmail(row) {
     var script_registration_mail_name = options["REG_MAIL_NAME"];
     if (options["AUTO_REG_MAIL"] == true) {
-        var scriptRange = registerSheet.getRange(row + 1, indexOfScript, 1, 1);
-        
+        //var scriptRange = registerSheet.getRange(row + 1, indexOfScript, 1, 1);
+        var scriptRange = row.getCell(1, indexOfScript);
+        var email = getByNameRow("Email", row);
         var emailSent = scriptRange.getValues()[0];     // column where we can check if the user already got an email
-        Logger.log("emailSent "+ emailSent);
-        Logger.log("Email " + getByName("Email",row));
-        if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && getByName("Email", row) != "") {  // Prevents sending duplicates
+        Logger.log("emailSent " + emailSent);
+        Logger.log("row " + row);
+        Logger.log("Email " + email);
+        if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && email != "") {  // Prevents sending duplicates
             var subject = "Registration " + options["EVENT_TITLE"];
             //if the user has a whole confirm draft
             if (script_registration_mail_name != "") {
-                if (sendGmailRegisterTemplate(getByName("Email", row), subject, row)) {
+                if (sendGmailRegisterTemplate(email, subject, row)) {
                     scriptRange.setValue(REGISTER_MAIL);
                 } else {
                     Logger.log("error while sending mail");
@@ -271,13 +273,13 @@ function sendGmailTemplate(recipient, i, type, options) {
 *
 * @returns        GmailApp   the Gmail service, useful for chaining
 */
-function sendGmailRegisterTemplate(recipient, subject, i, mail_options) {
+function sendGmailRegisterTemplate(recipient, subject, row, mail_options) {
     var draftsubject = options["REG_MAIL_NAME"];
     if (options["REG_MAIL_PAYMENTTYPE"]) {
-        var paymentmethod = getByName("Payment method", i);
+        var paymentmethod = getByNameRow("Payment method", row);
         draftsubject = draftsubject + "_" + paymentmethod;
     }
-    return sendGmailTemplate(recipient, subject, i, mail_options, draftsubject);
+    return sendGmailTemplate(recipient, subject, row, mail_options, draftsubject);
 }
 //constructs extra email template and sends it --------------------------------------------------------------------------------------------------------------------------------------------------------//
 /**
@@ -312,20 +314,20 @@ function sendGmailExtraTemplate(recipient, subject, i, options) {
 *
 * @returns        GmailApp   the Gmail service, useful for chaining
 */
-function sendGmailConfirmTemplate(recipient, subject, i, mail_options) {
-    return sendGmailTemplate(recipient, subject, i, mail_options, options["REG_MAIL_NAME"]);
+function sendGmailConfirmTemplate(recipient, subject, row, mail_options) {
+    return sendGmailTemplate(recipient, subject, row, mail_options, options["CONF_MAIL_NAME"]);
 }
 
-function sendGmailTemplate(recipient, subject, i, mail_options, draftsubject) {
+function sendGmailTemplate(recipient, subject, row, mail_options, draftsubject) {
     mail_options = mail_options || {};  // default is no options
-    
+
     if (!existsDraft(draftsubject)) throw new Error("TEMPLATE not found in drafts folder: " + draftsubject);
     var template = readDraft(draftsubject)
 
     // Generate htmlBody from template, with provided text body
     var imgUpdates = updateInlineImages(template);
     var message = imgUpdates.templateBody;
-    message = replaceTerms(message, i);
+    message = replaceTerms(message, row);
     mail_options.htmlBody = message;
     mail_options.attachments = imgUpdates.attachments;
     mail_options.inlineImages = imgUpdates.inlineImages;
@@ -384,17 +386,17 @@ function updateInlineImages(template) {
     return updatedTemplate;
 }
 //Replace Terms in Email --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function replaceTerms(message, i) {
+function replaceTerms(message, row) {
     var columnrange = registerSheet.getRange(1, 1, 1, registerSheet.getLastColumn());
     var columnvalues = columnrange.getValues();
-    
+
     message = replaceConfVars(message);
-    message = replaceTemplateKey(message, "PRICE", calculatePrice(i));
+    message = replaceTemplateKey(message, "PRICE", calculatePrice(row));
 
     for (var j = 0; j < columnvalues[0].length; j++) {
         var key = columnvalues[0][j];
         if (key != null) {
-            message = replaceTemplateKey(message, key, getByName(columnvalues[0][j], i));
+            message = replaceTemplateKey(message, key, getByNameRow(columnvalues[0][j], row));
         }
     }
     return message;
@@ -403,36 +405,37 @@ function replaceTerms(message, i) {
 * creates the draft mails according to the names in the fields 
 */
 function createDraftMails() {
-    var script_confirm_mail_name = getFieldValue('script_confirm_mail_name');
-    var script_registration_mail_name = getFieldValue('script_registration_mail_name');
-    var script_extra_mail_name = getFieldValue('script_extra_mail_name');
-    var script_register_on_pay = getFieldValue('script_register_on_pay');
-    var range = optionSheet.getRange(4, 10, 30, 3).getValues(); //get range J4:L34
-    console.log(range);
+    var script_registration_mail_name = options["REG_MAIL_NAME"];
+    var script_confirm_mail_name = options["CONF_MAIL_NAME"];
+    var script_extra_mail_name = options["EXTRA_MAIL_NAME"];
+
     var payment_methods = [];
-    for (var i = 0; i < range.length; i++) {
-        if (range[i][0] == "Payment method") {
-            payment_methods = range[i][2].split(',');
+    var questions = getAllQuestions();
+    for each(var question in questions) {
+        if (question.title == "Payment method") {
+            payment_methods = question.options;
         }
     }
-    console.log(payment_methods);
-    var drafts = GmailApp.getDraftMessages();
-    if (!existsDraft(script_confirm_mail_name, drafts)) {
+    Logger.log(payment_methods);
+
+    if (script_confirm_mail_name != "" && !existsDraft(script_confirm_mail_name, drafts)) {
         GmailApp.createDraft("", script_confirm_mail_name, "", { htmlBody: "Confirm email" });
     }
-    if (!existsDraft(script_extra_mail_name, drafts)) {
+    if (script_extra_mail_name != "" && !existsDraft(script_extra_mail_name, drafts)) {
         GmailApp.createDraft("", script_extra_mail_name, "", { htmlBody: "Extra email" });
     }
-    if (script_register_on_pay == "yes") {
-        // payment specific email
-        for each(var payment in payment_methods) {
-            var subject = script_registration_mail_name + "_" + payment;
-            if (!existsDraft(subject, drafts)) {
-                GmailApp.createDraft("", subject, "", { htmlBody: "Fill Payment info " + payment });
+    if (script_registration_mail_name != "") {
+        if (options["REG_MAIL_PAYMENTTYPE"]) {
+            // payment specific email
+            for each(var payment in payment_methods) {
+                var subject = script_registration_mail_name + "_" + payment;
+                if (!existsDraft(subject, drafts)) {
+                    GmailApp.createDraft("", subject, "", { htmlBody: "Fill Payment info " + payment });
+                }
             }
+        } else {
+            GmailApp.createDraft("", script_registration_mail_name, "", { htmlBody: "Registration email " });
         }
-    } else {
-        GmailApp.createDraft("", script_registration_mail_name, "", { htmlBody: "Registration email " });
     }
 }
 /**
@@ -474,5 +477,5 @@ function sendMail(email_to, subject, html_body) {
 // test code
 
 function testMailSend() {
-    sendMail("bernhard@buddynetwork.at","testsubject", readDraft("Generic_Confirmation") );
+    sendMail("bernhard@buddynetwork.at", "testsubject", readDraft("Generic_Confirmation"));
 }
