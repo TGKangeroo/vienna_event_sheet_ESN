@@ -2,9 +2,9 @@ var options = readConfig();
 
 //Stops accepting responses to the google form --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function closeForm() {
-    //var form = FormApp.openByUrl(optionSheet.getRange('B36').getValue());
-    //form.setAcceptingResponses(false);
-    //form.setCustomClosedFormMessage("I'm sorry but we're currently not taking anymore registrations. This means that either we've reached the maximum amount of participants, or the registration deadline has passed.");
+    var form = FormApp.openByUrl(optionSheet.getRange('G15').getValue());
+    form.setAcceptingResponses(false);
+    form.setCustomClosedFormMessage("I'm sorry but we're currently not taking anymore registrations. This means that either we've reached the maximum amount of participants, or the registration deadline has passed.");
 }
 //Opens the google form for responses --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function openForm() {

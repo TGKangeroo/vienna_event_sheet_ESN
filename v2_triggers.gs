@@ -45,7 +45,7 @@ function onEdit(e) {
             case "yes":
                 if (amount_total_part == event_max_participants) {
                     showAlert('Warning, last participant!', 'This is the last person you can accept before you reach the max amount of participants');
-                    if(optinos["CLOSE_WHEN_FULL"]) {
+                    if(options["CLOSE_WHEN_FULL"]) {
                         closeForm();
                     }
                 }
@@ -80,12 +80,12 @@ function onSubmit(e) {
     if( indexOfPaid == -1) {
         makePayAndEditedRow();
     }
-    Logger.log("index of paid: "+ indexOfPaid);
     
     var range = e.range;
     var rowId = range.getRow(); // row used for inserting into the google sheet
 
     var row = registerSheet.getRange(rowId, 1, 1, registerSheet.getLastColumn() );
+    Logger.info("row" + row);
     var cell = row.getCell(1, indexOfPaid);  
     
     var rule = SpreadsheetApp.newDataValidation().requireValueInList(['yes', 'no', 'cancelled', 'refunded'], false).build();
@@ -93,7 +93,7 @@ function onSubmit(e) {
 
     var event_max_participants = options["MAX_PARTICIPANTS"];
     var amount_total_part = 0;
-    amount_total_part = countParticipants();
+    amount_total_part = countParticipants()+1; //add +1 cause entry is still not persisted
     if (options["PAID_EVENT"] == true) {
         if (cell.getValue() != "cancelled" && cell.getValue() != "refunded") {
             cell.setValue('no');
@@ -103,12 +103,14 @@ function onSubmit(e) {
         }
     } else {
         cell.setValue('yes');
+        updatePrices();
         if (options["AUTO_CONF_MAIL"] == true) {
             sendconfirmationEmail(row);
         }
         if ((amount_total_part == event_max_participants || 
             amount_total_part > event_max_participants) && 
-            event_max_participants != "0" && options["CLOSE_WHEN_FULL"] == true) {
+            event_max_participants != "0" && options["CLOSE_WHEN_FULL"]) {
+            Logger.log("event reached max participants");
             closeForm();
         }
     }

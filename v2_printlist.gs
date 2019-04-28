@@ -19,10 +19,11 @@ function refreshPrintList() {
     var lastCol = printSheet.getLastColumn();
     for (var y = 1; y < lastRow; ++y) {
         var printrow = [];
-
-        for (var i = 0; i < lastCol; i++) {
-            printrow[i] = getByNameData(registrations, printSheetColumns[0][i], y);
+        if (getByNameData(registrations, "Paid", y) == "yes") {
+            for (var i = 0; i < lastCol; i++) {
+                printrow[i] = getByNameData(registrations, printSheetColumns[0][i], y);
+            }
+            printSheet.appendRow(printrow);
         }
-        printSheet.appendRow(printrow);
     }
 }

@@ -5,7 +5,11 @@ var priceSheet = ss.getSheetByName("Prices");
 var printSheet = ss.getSheetByName("Print list");
 var budgetSheet = ss.getSheetByName("Budget");
 var registerSheet = ss.getSheetByName("Registrations");
-var registerHeaders = registerSheet.getDataRange().getValues()[0];
+
+var registerHeaders = []
+if(registerSheet != null) {
+    registerHeaders = registerSheet.getDataRange().getValues()[0];
+}
 
 var drafts = GmailApp.getDraftMessages();
 var prices = getAllPrices();
@@ -29,6 +33,7 @@ function makePayAndEditedRow() {
     registerSheet.getRange(1, idxLast + 4).setValue('Script');
 
     SpreadsheetApp.flush();
+    registerHeaders = registerSheet.getDataRange().getValues()[0];
 
     indexOfPaid = getColumnId("Paid");
     indexOfTotal = getColumnId("to be paid");
@@ -110,7 +115,6 @@ function updatePrices() {
 }
 //Calculate the price per participant --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function calculatePrice(row) {
-    Logger.log("calcprices");
     var prices = getAllPrices();
     var pay = 0;
     for (var i = 0; i < prices.length; i++) {
@@ -124,7 +128,6 @@ function calculatePrice(row) {
             }
         }
     }
-    Logger.log("calcprices end");
     return pay;
 }
 
@@ -143,7 +146,7 @@ function checkEndDate() {
 }
 //Count the amount of paid participants --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function countParticipants() {
-    var dataRange = registerSheet.getRange(2, indexOfPaid, registerSheet.getLastRow() - 1, indexOfPaid); // let it read more columns than are being used, it might mess up otherwise
+    var dataRange = registerSheet.getRange(2, indexOfPaid, registerSheet.getLastRow(), indexOfPaid); // let it read more columns than are being used, it might mess up otherwise
     // Fetch values for each row in the Range.
     var data = dataRange.getValues();
     var counter = 0;
