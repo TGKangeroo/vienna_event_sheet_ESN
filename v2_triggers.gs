@@ -10,15 +10,6 @@ function resetTriggers() {
         .forSpreadsheet(ss)
         .onFormSubmit()
         .create();
-    var enddate = Utilities.formatDate(new Date(options["CLOSING_DATE"]), "Europe/Vienna", "dd-yyyy-MM");
-    var today = Utilities.formatDate(new Date(), "Europe/Vienna", "dd-yyyy-MM");
-    if (today != enddate && today < enddate) {
-        ScriptApp.newTrigger("checkEndDate")
-            .timeBased()
-            .atHour(12)
-            .everyDays(1) // Frequency is required if you are using atHour() or nearMinute()
-            .create();
-    }
 }
 //Remove Triggers --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function removeTriggers() {

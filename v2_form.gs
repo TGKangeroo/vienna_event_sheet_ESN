@@ -36,6 +36,8 @@ function renameResponsesSheet() {
 function makeForm() {
     if (isFormCreated()) {
         Logger.log("form already created")
+        resetTriggers();
+        createDraftMails();
         return;
     } else {
         Logger.log("creating form");
