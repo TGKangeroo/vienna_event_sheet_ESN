@@ -7,7 +7,7 @@ var EXTRA_MAIL = "extra sent";
 function sendconfirmationEmail(row) {
     if (options["AUTO_CONF_MAIL"]) {
         var scriptRange = row.getCell(1, indexOfScript);
-        var emailSent = scriptRange.getValues()[0];
+        var emailSent = scriptRange.getValue();
         var email = getByNameRow("Email", row);
         if (emailSent != CONFIRM_MAIL && email != "" && getByNameRow("Paid", row) == "yes") {  // Prevents sending duplicates
             var subject = "Confirmation " + options["EVENT_TITLE"];
@@ -27,7 +27,7 @@ function sendRegisterEmail(row) {
         //var scriptRange = registerSheet.getRange(row + 1, indexOfScript, 1, 1);
         var scriptRange = row.getCell(1, indexOfScript);
         var email = getByNameRow("Email", row);
-        var emailSent = scriptRange.getValues()[0];     // column where we can check if the user already got an email
+        var emailSent = scriptRange.getValue();     // column where we can check if the user already got an email
         if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && email != "") {  // Prevents sending duplicates
             var subject = "Registration " + options["EVENT_TITLE"];
             //if the user has a whole confirm draft

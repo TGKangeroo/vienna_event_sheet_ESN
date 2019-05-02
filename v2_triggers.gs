@@ -2,11 +2,11 @@
 //Add Triggers --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function resetTriggers() {
     removeTriggers();
-    ScriptApp.newTrigger('onEdit')
+    ScriptApp.newTrigger('onESNEdit')
         .forSpreadsheet(ss)
         .onEdit()
         .create();
-    ScriptApp.newTrigger('onSubmit')
+    ScriptApp.newTrigger('onESNSubmit')
         .forSpreadsheet(ss)
         .onFormSubmit()
         .create();
@@ -18,9 +18,15 @@ function removeTriggers() {
         ScriptApp.deleteTrigger(allTriggers[i]);
     }
 }
+
 //on Sheet Edit Trigger --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function onEdit(e) {
+function onESNEdit(e) {
     var range = e.range
+
+    if(range.getNumColumns() != 1 || range.getNumRows() != 1) {
+        showAlert('Warning', 'Only change one row at a time!');
+        return;
+    }
     var rowId = range.getRow(); // row used for inserting into the google sheet
 
     var row = registerSheet.getRange(rowId, 1, 1, registerSheet.getLastColumn());
@@ -34,20 +40,23 @@ function onEdit(e) {
     if (range.getColumn() == indexOfPaid && indexOfPaid != -1 && editedSheet.getName() == registerSheet.getName()) {
         switch (e.value) {
             case "yes":
-                if (amount_total_part == event_max_participants) {
-                    showAlert('Warning, last participant!', 'This is the last person you can accept before you reach the max amount of participants');
-                    if (options["CLOSE_WHEN_FULL"]) {
-                        closeForm();
-                    }
-                }
                 if (amount_total_part > event_max_participants) {
-                    answer = showAlert('Warning max participants reached', "If you accept this person you're over your max amount of participants!");
                     paidCell.setValue('no');
+                    paidCell.setComment('Denied max participants reached');
+                    row.getCell(1, getColumnId("last Edited")).setValue(new Date());
+                    SpreadsheetApp.flush();
                     return;
                 }
                 row.setBackground("MediumSeaGreen");
                 if (options["AUTO_CONF_MAIL"] == true) {
                     sendconfirmationEmail(row);
+                }
+                SpreadsheetApp.flush();
+                if (amount_total_part == event_max_participants) {
+                    paidCell.setComment('Warning, last participant!');
+                    if (options["CLOSE_WHEN_FULL"]) {
+                        closeForm();
+                    }
                 }
                 break;
             case "no":
@@ -67,7 +76,7 @@ function onEdit(e) {
 }
 
 //on Form Submit Trigger --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function onSubmit(e) {
+function onESNSubmit(e) {
     if (indexOfPaid == -1) {
         makePayAndEditedRow();
     }

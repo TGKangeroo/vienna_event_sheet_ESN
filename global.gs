@@ -107,7 +107,7 @@ function updatePrices() {
     dataRange = priceSheet.getRange("A3:E19");
     data = dataRange.getValues();
     for (i = 0; i < data.length; i++) {
-        if (prices[i] != null && prices[i][idxAmount] != 0) {
+        if (prices[i] != null && prices[i][idxValue] != '') {
             priceSheet.getRange(i + 3, idxAmount+1).setValue(prices[i][idxAmount]);
             SpreadsheetApp.flush();
         }
@@ -168,8 +168,14 @@ function updateTotalParticipants() {
 
 //test function for development --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function showAlert(title,msg) {
+    var htmlOutput = HtmlService
+        .createHtmlOutput(msg)
+        .setWidth(250)
+        .setHeight(300);
+    SpreadsheetApp.getUi().showModalDialog(htmlOutput, title);
+
     Logger.log(title + msg );
-    var ui = SpreadsheetApp.getUi();
-    ui.alert(title, msg, ui.ButtonSet.OK);
+    //var ui = SpreadsheetApp.getUi();
+    //ui.alert(title, msg, ui.ButtonSet.OK);
 }
 
