@@ -11,6 +11,10 @@ function cleanList() {
 function refreshPrintList() {
 
     cleanList();
+    if(registerSheet == null) {
+        // form not created yet
+        return;
+    }
     var printSheetRange = printSheet.getRange(1, 1, 1, printSheet.getLastColumn());
     var printSheetColumns = printSheetRange.getValues();
 

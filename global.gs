@@ -13,7 +13,7 @@ if (registerSheet != null) {
 
 var _drafts = []; // Lazy load draft mails
 function getDraftMessages() {
-    if (drafts.ength == 0) {
+    if (_drafts.length == 0) {
         _drafts = GmailApp.getDraftMessages()
     }
     return _drafts;
