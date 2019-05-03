@@ -14,7 +14,6 @@ function getAllQuestions() {
             questions.push( { title: values[row][1], required: values[row][2], type: form_type, options: form_options, desc: values[row][5] } );
         }
     }
-    Logger.log(questions);
     return questions;
 }
 

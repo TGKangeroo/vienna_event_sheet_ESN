@@ -7,26 +7,37 @@ var budgetSheet = ss.getSheetByName("Budget");
 var registerSheet = ss.getSheetByName("Registrations");
 
 var registerHeaders = []
-if(registerSheet != null) {
-    registerHeaders = registerSheet.getDataRange().getValues()[0];
+if (registerSheet != null) {
+    registerHeaders = registerSheet.getRange("A1:AA1").getValues()[0];
 }
 
-var drafts = GmailApp.getDraftMessages();
-var prices = getAllPrices();
-
+var _drafts = []; // Lazy load draft mails
+function getDraftMessages() {
+    if (drafts.ength == 0) {
+        _drafts = GmailApp.getDraftMessages()
+    }
+    return _drafts;
+}
+var _prices = []; // lazy load
 //returns array of all prices written in the yellow optionsheet block --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function getAllPrices() {
-    return priceSheet.getRange("A3:E19").getValues();
+    if (_prices.length == 0) {
+        _prices = priceSheet.getRange("A3:E19").getValues();
+        _prices = _prices.filter( function(price) {
+            return price[0] != "";
+        });
+    }
+    return _prices;
 }
 //adds the price a participant has to pay to the registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function totalPriceToBePaid(row) {
     var price = calculatePrice(row);
-    row.getCell(1, indexOfTotal).setValue(price); 
+    row.getCell(1, indexOfTotal).setValue(price);
 }
 //Add last edited and paid columns to registration sheet --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function makePayAndEditedRow() {
     var idxLast = registerSheet.getLastColumn()
-    
+
     registerSheet.getRange(1, idxLast + 1).setValue('Paid');
     registerSheet.getRange(1, idxLast + 2).setValue('last Edited');
     registerSheet.getRange(1, idxLast + 3).setValue('to be paid');
@@ -56,11 +67,11 @@ var indexOfScript = getColumnId("Script");
 
 
 //searches a registration value based on column name and row --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function getByNameRow(colName,row) {
+function getByNameRow(colName, row) {
     var colId = getColumnId(colName);
-    if(colId < 0) {
-        Logger.log("could not find colId for "+ colName);
-        return "not found:"+colName;
+    if (colId < 0) {
+        Logger.log("could not find colId for " + colName);
+        return "not found:" + colName;
     }
     return row.getCell(1, colId).getValues()[0];
 }
@@ -86,32 +97,27 @@ function updatePrices() {
     var idxField = 3;
     var idxValue = 4;
     var prices = getAllPrices();
+    var amounts = new Array(prices.length);
     for (var i = 0; i < prices.length; i++) {
-        prices[i][idxAmount] = 0;
+        amounts[i] = new Array(1);
+        amounts[i][0] = 0;
     }
     var dataRange = registerSheet.getRange(2, 1, registerSheet.getLastRow() - 1, registerSheet.getLastColumn()); // let it read more columns than are being used, it might mess up otherwise
     var registrations = dataRange.getValues();
     // Fetch values for each row in the Range.
-    var paid = getColumnId("Paid")-1; //array idx
+    var paid = getColumnId("Paid") - 1; //array idx
 
     for (var i = 0; i < registrations.length; ++i) {
         if (registrations[i][paid] == "yes") {
             for (var y = 0; y < prices.length; y++) {
                 var index = registerHeaders.indexOf(prices[y][idxField]);
                 if (registrations[i][index] == prices[y][idxValue]) {
-                    prices[y][idxAmount] = prices[y][idxAmount] + 1;
+                    amounts[y][0] = amounts[y][0] + 1;
                 }
             }
         }
     }
-    dataRange = priceSheet.getRange("A3:E19");
-    data = dataRange.getValues();
-    for (i = 0; i < data.length; i++) {
-        if (prices[i] != null && prices[i][idxValue] != '') {
-            priceSheet.getRange(i + 3, idxAmount+1).setValue(prices[i][idxAmount]);
-            SpreadsheetApp.flush();
-        }
-    }
+    priceSheet.getRange(3, idxAmount + 1, prices.length).setValues(amounts);
 }
 //Calculate the price per participant --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function calculatePrice(row) {
@@ -155,8 +161,6 @@ function countParticipants() {
         if (row[0] == "yes") {
             counter++;
         }
-        // Make sure the cell is updated right away in case the script is interrupted
-        SpreadsheetApp.flush();
     }
     return counter;
 }
@@ -167,15 +171,13 @@ function updateTotalParticipants() {
 }
 
 //test function for development --------------------------------------------------------------------------------------------------------------------------------------------------------//
-function showAlert(title,msg) {
+function showAlert(title, msg) {
     var htmlOutput = HtmlService
         .createHtmlOutput(msg)
         .setWidth(250)
         .setHeight(300);
     SpreadsheetApp.getUi().showModalDialog(htmlOutput, title);
 
-    Logger.log(title + msg );
-    //var ui = SpreadsheetApp.getUi();
-    //ui.alert(title, msg, ui.ButtonSet.OK);
+    Logger.log(title + msg);
 }
 

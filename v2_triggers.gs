@@ -21,6 +21,10 @@ function removeTriggers() {
 
 //on Sheet Edit Trigger --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function onESNEdit(e) {
+    var editedSheet = e.source.getActiveSheet();
+    if( editedSheet.getName() != registerSheet.getName() ) {
+        return;
+    }
     var range = e.range
 
     if(range.getNumColumns() != 1 || range.getNumRows() != 1) {
@@ -32,12 +36,12 @@ function onESNEdit(e) {
     var row = registerSheet.getRange(rowId, 1, 1, registerSheet.getLastColumn());
     var paidCell = row.getCell(1, indexOfPaid);
 
-    var editedSheet = e.source.getActiveSheet();
+    
     var event_max_participants = options["MAX_PARTICIPANTS"];
     var amount_total_part = updateTotalParticipants();
     //check if the changed value is on the paid row and if it's changed to yes
 
-    if (range.getColumn() == indexOfPaid && indexOfPaid != -1 && editedSheet.getName() == registerSheet.getName()) {
+    if (range.getColumn() == indexOfPaid && indexOfPaid != -1) {
         switch (e.value) {
             case "yes":
                 if (amount_total_part > event_max_participants) {
@@ -51,7 +55,7 @@ function onESNEdit(e) {
                 if (options["AUTO_CONF_MAIL"] == true) {
                     sendconfirmationEmail(row);
                 }
-                SpreadsheetApp.flush();
+                
                 if (amount_total_part == event_max_participants) {
                     paidCell.setComment('Warning, last participant!');
                     if (options["CLOSE_WHEN_FULL"]) {
@@ -72,6 +76,7 @@ function onESNEdit(e) {
         row.getCell(1, getColumnId("last Edited")).setValue(new Date());
         totalPriceToBePaid(row);
         updatePrices();
+        SpreadsheetApp.flush();
     }
 }
 

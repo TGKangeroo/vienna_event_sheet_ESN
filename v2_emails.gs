@@ -15,8 +15,6 @@ function sendconfirmationEmail(row) {
             if (sendGmailTemplate(email, subject, row, {}, options["CONF_MAIL_NAME"])) {
                 scriptRange.setValue(CONFIRM_MAIL);
             }
-            // Make sure the cell is updated right away in case the script is interrupted
-            SpreadsheetApp.flush();
         }
     }
 }
@@ -192,12 +190,11 @@ function createDraftMails() {
             payment_methods = question.options;
         }
     }
-    Logger.log(payment_methods);
 
-    if (script_confirm_mail_name != "" && !existsDraft(script_confirm_mail_name, drafts)) {
+    if (script_confirm_mail_name != "" && !existsDraft(script_confirm_mail_name)) {
         GmailApp.createDraft("", script_confirm_mail_name, "", { htmlBody: "Confirm email" });
     }
-    if (script_extra_mail_name != "" && !existsDraft(script_extra_mail_name, drafts)) {
+    if (script_extra_mail_name != "" && !existsDraft(script_extra_mail_name)) {
         GmailApp.createDraft("", script_extra_mail_name, "", { htmlBody: "Extra email" });
     }
     if (script_registration_mail_name != "") {
@@ -205,7 +202,7 @@ function createDraftMails() {
             // payment specific email
             for each(var payment in payment_methods) {
                 var subject = script_registration_mail_name + "_" + payment;
-                if (!existsDraft(subject, drafts)) {
+                if (!existsDraft(subject)) {
                     GmailApp.createDraft("", subject, "", { htmlBody: "Fill Payment info " + payment });
                 }
             }
@@ -219,6 +216,7 @@ function createDraftMails() {
  * drafts = GmailApp.getDraftMessages();
  * */
 function existsDraft(subject) {
+    drafts = getDraftMessages();
     for each(var draft in drafts) {
         if (draft.getSubject() == subject) {
             return true;
@@ -230,8 +228,8 @@ function existsDraft(subject) {
 
 
 function readDraft(draft_name) {
+    drafts = getDraftMessages();
     for (var i = 0; i < drafts.length; ++i) {
-        //Logger.log(drafts[i].getMessage().getSubject());
         if (drafts[i].getSubject() == draft_name) {
             return drafts[i];
         }

@@ -11,7 +11,6 @@ function readConfig() {
             options[name] = values[row][2];
         }
     }
-    Logger.log(options);
     return options;
     
 }
