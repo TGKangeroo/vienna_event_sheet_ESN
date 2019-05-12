@@ -38,15 +38,18 @@ function totalPriceToBePaid(row) {
 function makePayAndEditedRow() {
     var idxLast = registerSheet.getLastColumn()
 
-    registerSheet.getRange(1, idxLast + 1).setValue('Paid');
-    registerSheet.getRange(1, idxLast + 2).setValue('last Edited');
-    registerSheet.getRange(1, idxLast + 3).setValue('to be paid');
-    registerSheet.getRange(1, idxLast + 4).setValue('Script');
+    registerSheet.getRange(1, idxLast + 1).setValue('to be paid');
+    registerSheet.getRange(1, idxLast + 2).setValue('Paid');
+    registerSheet.getRange(1, idxLast + 3).setValue('Paid Location');
+    registerSheet.getRange(1, idxLast + 4).setValue('Comment');
+    registerSheet.getRange(1, idxLast + 5).setValue('last Edited');
+    registerSheet.getRange(1, idxLast + 6).setValue('Script');
 
     SpreadsheetApp.flush();
     registerHeaders = registerSheet.getDataRange().getValues()[0];
 
     indexOfPaid = getColumnId("Paid");
+    indexOfPaidLoc = getColumnId("Paid Location");
     indexOfTotal = getColumnId("to be paid");
     indexOfScript = getColumnId("Script");
 }
@@ -61,6 +64,7 @@ function getColumnId(colName) {
 }
 
 var indexOfPaid = getColumnId("Paid");
+var indexOfPaidLoc = getColumnId("Paid Location");
 var indexOfTotal = getColumnId("to be paid");
 var indexOfScript = getColumnId("Script");
 

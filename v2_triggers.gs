@@ -95,6 +95,12 @@ function onESNSubmit(e) {
 
     var rule = SpreadsheetApp.newDataValidation().requireValueInList(['yes', 'no', 'cancelled', 'refunded'], false).build();
     cell.setDataValidation(rule);
+    
+    var paidLoc = row.getCell(1,indexOfPaidLoc);
+    paidLoc.setDataValidation(
+        SpreadsheetApp.newDataValidation().requireValueInList(
+            options["PAYMENT_LOCATION"].split(","), false).build());
+    
 
     var event_max_participants = options["MAX_PARTICIPANTS"];
     var amount_total_part = 0;

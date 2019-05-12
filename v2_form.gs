@@ -88,7 +88,6 @@ function makeForm() {
     //sharingIsCaring(Form);
     
     optionSheet.getRange("G14").setValue(form.getPublishedUrl());
-    optionSheet.getRange("G15").setValue(form.getEditUrl());
     optionSheet.getRange("G16").setValue(ss.getUrl());
     SpreadsheetApp.flush();
 
