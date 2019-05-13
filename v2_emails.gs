@@ -207,7 +207,9 @@ function createDraftMails() {
                 }
             }
         } else {
-            GmailApp.createDraft("", script_registration_mail_name, "", { htmlBody: "Registration email " });
+            if (!existsDraft(script_registration_mail_name)) {
+                GmailApp.createDraft("", script_registration_mail_name, "", { htmlBody: "Registration email " });
+            }
         }
     }
 }
