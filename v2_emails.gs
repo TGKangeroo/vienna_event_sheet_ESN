@@ -5,51 +5,73 @@ var EXTRA_MAIL = "extra sent";
 
 //sends confirmation email to the participant in row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendconfirmationEmail(row) {
-    if (options["AUTO_CONF_MAIL"]) {
-        var scriptRange = row.getCell(1, indexOfScript);
-        var emailSent = scriptRange.getValue();
-        var email = getByNameRow("Email", row);
-        if (emailSent != CONFIRM_MAIL && email != "" && getByNameRow("Paid", row) == "yes") {  // Prevents sending duplicates
-            var subject = "Confirmation " + options["EVENT_TITLE"];
-            //if the user has a whole confirm draft
-            if (sendGmailTemplate(email, subject, row, {}, options["CONF_MAIL_NAME"])) {
-                scriptRange.setValue(CONFIRM_MAIL);
-            }
+    if (!options["AUTO_CONF_MAIL"]) {
+        return;
+    }
+    var scriptRange = row.getCell(1, indexOfScript);
+    var emailSent = scriptRange.getValue();
+    var email = getByNameRow("Email", row);
+    if (emailSent != CONFIRM_MAIL && email != "" && getByNameRow("Paid", row) == "yes") {  // Prevents sending duplicates
+        var subject = "Confirmation " + options["EVENT_TITLE"];
+        //if the user has a whole confirm draft
+        if (sendGmailTemplate(email, subject, row, {}, options["CONF_MAIL_NAME"])) {
+            scriptRange.setValue(CONFIRM_MAIL);
         }
     }
 }
 //sends a registration email to the participant in row --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendRegisterEmail(row) {
     var script_registration_mail_name = options["REG_MAIL_NAME"];
-    if (options["AUTO_REG_MAIL"] == true) {
-        //var scriptRange = registerSheet.getRange(row + 1, indexOfScript, 1, 1);
-        var scriptRange = row.getCell(1, indexOfScript);
-        var email = getByNameRow("Email", row);
-        var emailSent = scriptRange.getValue();     // column where we can check if the user already got an email
-        if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && email != "") {  // Prevents sending duplicates
-            var subject = "Registration " + options["EVENT_TITLE"];
-            //if the user has a whole confirm draft
-            if (script_registration_mail_name != "") {
-                if (options["REG_MAIL_PAYMENTTYPE"]) {
-                    var paymentmethod = getByNameRow("Payment method", row);
-                    script_registration_mail_name = script_registration_mail_name + "_" + paymentmethod;
-                }
-                if (sendGmailTemplate(email, subject, row, {}, script_registration_mail_name)) {
-                    scriptRange.setValue(REGISTER_MAIL);
-                } else {
-                    Logger.log("error while sending mail");
-                }
-            }
-            // Make sure the cell is updated right away in case the script is interrupted
-            SpreadsheetApp.flush();
+    if (!options["AUTO_REG_MAIL"] || script_registration_mail_name == "") {
+        return;
+    }
+    //var scriptRange = registerSheet.getRange(row + 1, indexOfScript, 1, 1);
+    var scriptRange = row.getCell(1, indexOfScript);
+    var email = getByNameRow("Email", row);
+    var emailSent = scriptRange.getValue();     // column where we can check if the user already got an email
+    if (emailSent != REGISTER_MAIL && emailSent != CONFIRM_MAIL && email != "") {  // Prevents sending duplicates
+        var subject = "Registration " + options["EVENT_TITLE"];
+        //if the user has a whole confirm draft
+        if (options["REG_MAIL_PAYMENTTYPE"]) {
+            var paymentmethod = getByNameRow("Payment method", row);
+            script_registration_mail_name = script_registration_mail_name + "_" + paymentmethod;
         }
+        console.info('Sending reg mail %s running as', email, getUserEmail()); //DEBUG
+        if (sendGmailTemplate(email, subject, row, {}, script_registration_mail_name)) {
+            scriptRange.setValue(REGISTER_MAIL);
+            SpreadsheetApp.flush();
+        } else {
+            Logger.log("error while sending mail");
+        }
+        // Make sure the cell is updated right away in case the script is interrupted
     }
 }
+
+function getUserEmail() {
+    var userEmail = PropertiesService.getUserProperties().getProperty("userEmail");
+    if(!userEmail) {
+      var protection = SpreadsheetApp.getActive().getRange("A1").protect();
+      // tric: the owner and user can not be removed
+      protection.removeEditors(protection.getEditors());
+      var editors = protection.getEditors();
+      if(editors.length === 2) {
+        var owner = SpreadsheetApp.getActive().getOwner();
+        editors.splice(editors.indexOf(owner),1); // remove owner, take the user
+      }
+      userEmail = editors[0];
+      protection.remove();
+      // saving for better performance next run
+      // PropertiesService.getUserProperties().setProperty("userEmail",userEmail);
+    }
+    return userEmail;
+  }
+
+
 //sends an email to all participants when clicking extra email button --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function sendExtraEmails() {
     var script_extra_mail_name = options["EXTRA_MAIL_NAME"];
     if (script_extra_mail_name == "") {
-        showAlert("no extra mail name","specify extra mail name in options sheet");
+        showAlert("no extra mail name", "specify extra mail name in options sheet");
         return;
     }
 

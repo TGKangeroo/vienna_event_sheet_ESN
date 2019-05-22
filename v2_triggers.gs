@@ -19,6 +19,13 @@ function removeTriggers() {
     }
 }
 
+//Print Triggers --------------------------------------------------------------------------------------------------------------------------------------------------------//
+function printTriggers() {
+    var allTriggers = ScriptApp.getProjectTriggers();
+    for (var i = 0; i < allTriggers.length; i++) {
+        Logger.info(allTriggers[i]);
+    }
+}
 //on Sheet Edit Trigger --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function onESNEdit(e) {
     var editedSheet = e.source.getActiveSheet();
@@ -65,6 +72,7 @@ function onESNEdit(e) {
                 break;
             case "no":
                 row.setBackground("white");
+                sendRegisterEmail(row); // try to resend mail if not sent
                 break;
             case "cancelled":
                 row.setBackground("red");
@@ -85,7 +93,7 @@ function onESNSubmit(e) {
     if (indexOfPaid == -1) {
         makePayAndEditedRow();
     }
-
+    console.info('onSubmit running as', getUserEmail()); //DEBUG
     var range = e.range;
     var rowId = range.getRow(); // row used for inserting into the google sheet
 
