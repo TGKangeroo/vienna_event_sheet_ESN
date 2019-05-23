@@ -51,9 +51,10 @@ function makePayAndEditedRow() {
     registerSheet.getRange(1, idxLast + 2).setValue('Paid');
     registerSheet.getRange(1, idxLast + 3).setValue('When');
     registerSheet.getRange(1, idxLast + 4).setValue('Where');
-    registerSheet.getRange(1, idxLast + 5).setValue('Comment');
-    registerSheet.getRange(1, idxLast + 6).setValue('last Edited');
-    registerSheet.getRange(1, idxLast + 7).setValue('Script');
+    registerSheet.getRange(1, idxLast + 5).setValue('How Much');
+    registerSheet.getRange(1, idxLast + 6).setValue('Comment');
+    registerSheet.getRange(1, idxLast + 7).setValue('last Edited');
+    registerSheet.getRange(1, idxLast + 8).setValue('Script');
 
     protectFirstRow();
 
