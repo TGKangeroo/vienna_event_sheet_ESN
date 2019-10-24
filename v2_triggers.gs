@@ -42,6 +42,8 @@ function onESNEdit(e) {
 
     var row = registerSheet.getRange(rowId, 1, 1, registerSheet.getLastColumn());
     var paidCell = row.getCell(1, indexOfPaid);
+    var whenCell = row.getCell(1, indexOfPaidWhen);
+    var paidLoc = row.getCell(1,indexOfPaidLoc);
 
     
     var event_max_participants = options["MAX_PARTICIPANTS"];
@@ -51,6 +53,13 @@ function onESNEdit(e) {
     if (range.getColumn() == indexOfPaid && indexOfPaid != -1) {
         switch (e.value) {
             case "yes":
+                if(options["PAID_EVENT"] && 
+                    (whenCell.getValue() == "" || paidLoc.getValue() == "")) {
+                        
+                    paidCell.setValue('no');
+                    paidCell.setComment('you have to fill When Where column first');
+                    return;
+                }
                 if (amount_total_part > event_max_participants) {
                     paidCell.setValue('no');
                     paidCell.setComment('Denied max participants reached');

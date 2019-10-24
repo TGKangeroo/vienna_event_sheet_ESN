@@ -63,6 +63,7 @@ function makePayAndEditedRow() {
     registerHeaders = registerSheet.getDataRange().getValues()[0];
 
     indexOfPaid = getColumnId("Paid");
+    indexOfPaidWhen = getColumnId("When");
     indexOfPaidLoc = getColumnId("Where");
     indexOfTotal = getColumnId("to be paid");
     indexOfScript = getColumnId("Script");
@@ -78,6 +79,7 @@ function getColumnId(colName) {
 }
 
 var indexOfPaid = getColumnId("Paid");
+var indexOfPaidWhen = getColumnId("When");
 var indexOfPaidLoc = getColumnId("Where");
 var indexOfTotal = getColumnId("to be paid");
 var indexOfScript = getColumnId("Script");
@@ -111,9 +113,9 @@ function getByNameData(data, colName, row) {
 }
 //updates the amount field 30B --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function updatePrices() {
-    var idxAmount = 2;
-    var idxField = 3;
-    var idxValue = 4;
+    var idxAmount = 4;
+    var idxField = 1;
+    var idxValue = 2;
     var prices = getAllPrices();
     var amounts = new Array(prices.length);
     for (var i = 0; i < prices.length; i++) {
@@ -139,15 +141,19 @@ function updatePrices() {
 }
 //Calculate the price per participant --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function calculatePrice(row) {
+    var idxField = 1;
+    var idxValue = 2;
+    var idxPrice = 3;
+
     var prices = getAllPrices();
     var pay = 0;
     for (var i = 0; i < prices.length; i++) {
-        if (!(isNaN(prices[i][1])) && prices[i][1] != "") {
+        if (!(isNaN(prices[i][idxPrice])) && prices[i][idxPrice] != "") {
             if (prices[i][3] == "Base Price") {
-                pay = pay + prices[i][1];
+                pay = pay + prices[i][idxPrice];
             } else {
-                if (getByNameRow(prices[i][3], row) == prices[i][4]) {
-                    pay = pay + prices[i][1];
+                if (getByNameRow(prices[i][idxField], row) == prices[i][idxValue]) {
+                    pay = pay + prices[i][idxPrice];
                 }
             }
         }

@@ -100,8 +100,12 @@ function replaceConfVars(string) {
     }
     return string;
 }
+function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
+
 function replaceTemplateKey(msg,key,value) {
-    return msg.replace(new RegExp("\\["+key+"\\]", 'g'), value);
+    return msg.replace(new RegExp(escapeRegExp("["+key+"]"), 'g'), value);
 }
 //Opens the google form for responses --------------------------------------------------------------------------------------------------------------------------------------------------------//
 function addCancellationPolicy(form) {
